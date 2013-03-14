@@ -1,0 +1,116 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{bm}
+
+\newcommand{\phib}{\bm{\phi}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\begin{document}
+
+\title{Laplace Approximation for Bayesian Logistic Regression: A Derivation}
+\author{Wei Dai}
+
+\maketitle
+
+This derivation is based on Bishop (2006). Given data set $\{\phib_n,
+t_n\}_{n=1}^N$ where $\phib_n$ are the feature vectors and $t_n\in \{0,1\}$
+are the labels, we can write the likelihood function for logistic regression
+as
+
+\begin{equation}
+p(\bm{t}|\bm{w}) = \prod_{n=1}^N y_n^{t_n} (1-y_n)^{1-t_n}
+\end{equation}
+
+where $\bm{t} = (t_1,...,t_N)^T$ and $y_n=p(\mathcal{C}_1|\phib_n) =
+\sigma(\bm{w}^T \phib_n)$ and $\sigma(s) = \frac{1}{1+e^{-s}}$. Using Bayes
+rule, the posterior distribution over $\bm{w}$ is
+
+\begin{equation}
+p(\bm{w}|\bm{t}) = \frac{p(\bm{w}) p(\bm{t}|\bm{w})}{p(\bm{t})}
+\end{equation}
+
+where $p(\bm{t}) = \int p(\bm{w})p(\bm{t}|\bm{w}) d\bm{w}$ involves logistic
+sigmoid functions and is intractable.  Laplace approximation approximate this
+posterior with a multivariate Guassian: 
+
+\begin{align}
+\begin{split}
+q(\bm{w})
+&=\frac{1}{(2\pi)^{M/2} |\bm{S}_N|^{1/2}} \exp\left\{ -\frac{1}{2}
+(\bm{w} - \bm{w}_{MAP})^T \bm{S}_N^{-1} (\bm{w} - \bm{w}_{MAP}) \right\}
+\\
+&= \mathcal{N}(\bm{w}; \bm{w}_{MAP}, \bm{S}_N)
+\end{split}
+\end{align}
+
+
+where $\bm{w}_{MAP}$ is the maximum {\it a posteriori} and thus a mode of the
+posterior and $\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln
+p(\bm{w}|\bm{t})|_{\bm{w} = \bm{w}_{MAP}}$
+is the Hessian at $\bm{w}_{MAP}$.  Since we are approximating the posterior
+with Gaussian, it is convenient to use conjugate prior $p(\bm{w}) =
+\mathcal{N}(\bm{w};\bm{m}_0,\bm{S}_0)$. Thus we have
+
+\begin{equation}
+\label{eq:objective}
+\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
+\bm{S}_0^{-1}(\bm{w}-\bm{m}_0) + \sum_{n=1}^N\{t_n \ln y_n +(1-y_n) \ln
+(1-y_n)\} + const
+\end{equation}
+
+Since eq.~\ref{eq:objective} is convex in $\bm{w}$ (?), we can use gradient
+descent to find $\bm{w}_{MAP} = \argmax_{\bm{w}} p(\bm{w}|\bm{t})
+=\argmax_{\bm{w}} \ln p(\bm{w}|\bm{t})$. Using the following facts:
+
+\begin{align}
+\nabla_{\bm{x}} \bm{m}^T \bm{A}\bm{x} &= \bm{A}^T\bm{x}
+\\
+\nabla_{\bm{x}} \bm{x}^T \bm{A}\bm{m} &= \bm{A}\bm{x}
+\\
+\nabla_{\bm{x}} \bm{x}^T \bm{A}\bm{x} &= \bm{A}\bm{x}+\bm{A}^T\bm{x}
+\\
+\nabla_{\bm{x}} \bm{A}\bm{x} &= \bm{A}
+\\
+\frac{\partial}{\partial s} \sigma(s) &= \sigma(s)(1-\sigma(s))
+\end{align}
+
+where $\bm{x},\bm{m} \in \mathbb{R}^d$, $\bm{A}\in \mathbb{R}^{d\times d}$.
+Also note that $\bm{S}_0^{-1} = \bm{S}_0^{-T}$, we
+arrive at
+
+\begin{align}
+\begin{split}
+\label{eq:gradient}
+\nabla_{\bm{w}} \ln p(\bm{w}|\bm{t}) &= -\bm{S}_0^{-1} (\bm{w}-\bm{m}_0) +
+\sum_{n=1}^N (t_n - y_n) \phib_n
+\end{split}
+\end{align}
+
+Since we generally want small $||\bm{w}||$ to avoid overfitting, we use
+$\bm{m}_0 = \bm{0}$ and $\bm{S}_0 = \sigma^2 \bm{I}$. We have the following
+update rule:
+
+\begin{equation}
+\bm{w}_t \leftarrow \bm{w}_{t-1} + \eta\left( \sum_{n=1}^N (t_n - y_{n,(t-1)}) \phib_n -
+\frac{1}{\sigma^2}\bm{w}_{t-1} \right)
+\end{equation}
+
+where $\eta$ is the learning rate constant. We can also get
+
+\begin{equation}
+\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln p(\bm{w}|\bm{t})
+= \bm{S}_0^{-1} + \sum_{n=1}^N y_n(1-y_n) \phib_n \phib_n^T
+\end{equation}
+
+Thus, we have the approximated posterior $q(\bm{w}) =
+\mathcal{N}(\bm{w};\bm{w_{MAP}},\bm{S}_N)$.
+
+%\begin{align}
+%\begin{split}
+
+%\end{align}
+
+
+
+\end{document}
