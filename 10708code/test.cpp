@@ -26,8 +26,11 @@ using namespace arma;
 using namespace std;
 using namespace boost::math;
 
+<<<<<<< HEAD
 #define REGULARIZATION 10
 
+=======
+>>>>>>> FETCH_HEAD
 //fmat vectorizeFloat(fmat input, float (*function)(float)){
 //	fmat result(1,input.n_elem);
 //	for(int i=0;i<input.n_elem;i++){
@@ -142,11 +145,14 @@ int main(){
 	}
 	float m = conv_to<float>::from(b*a);
 	cout<<a*b<<endl<<m<<endl;
+<<<<<<< HEAD
 
 	fmat c(5,5);
 	c.eye();
 	c=c*REGULARIZATION;
 	cout<<c<<endl<<1.0/pow(2,10);
+=======
+>>>>>>> FETCH_HEAD
 //	cout<<log(10e-323)<<endl;
 
 //	cout<<*(p)<<*(p++)<<*(p++)<<test_mat(test_mat.n_elem-1)<<endl;
