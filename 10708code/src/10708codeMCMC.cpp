@@ -18,8 +18,11 @@
 using namespace arma;
 using namespace std;
 
-#define NUM_SAMPLES 1000
-#define REGULARIZATION 5
+#define NUM_SAMPLES 10000
+#define REGULARIZATION 20
+#define ITER_THRESH 20
+#define R_THRESH 1e-4
+#define LAMBDA_CONST 1.0
 
 /**
  * filename needs to be space delimited, not csv, and need prior knowledge
@@ -27,21 +30,25 @@ using namespace std;
  */
 
 float getNormalSample(float mean, float var){
-	boost::mt19937 rng; // I don't seed it on purpouse (it's not relevant)
-	boost::normal_distribution<> nd(0, 1);
+	static boost::mt19937 rng; // I don't seed it on purpouse (it's not relevant)
+	static boost::normal_distribution<> nd(0, 1);
 	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_nor(rng, nd);
-	return var_nor();
+	float sample = var_nor();
+//	cout << "var_nor() "<<sample<<endl;
+	return sample;
 }
 
 float getUniformZeroOne(){
 	boost::mt19937 rng;
 	static boost::uniform_01<boost::mt19937> zeroone(rng);
-	return zeroone();;
+	float sample = zeroone();
+//	cout << "zeroone() "<<sample<<endl;
+	return sample;
 }
 
-bool rightmostInterva(float u, float lamda){
+bool rightmostInterval(float u, float lamda, bool debug){
 	float z=1;
-	float x = exp(0.5*lamda);
+	float x = exp(-0.5*lamda);
 	int j =0;
 	while (true){
 		j = j+1;
@@ -50,13 +57,15 @@ bool rightmostInterva(float u, float lamda){
 			return true;
 		j=j+1;
 		z=z+(pow(j+1,2)*pow(x,pow(j+1,2)-1));
+		if(debug)
+			cout<< "In RIGHT Z: "<<z<<endl;
 		if(z<u)
 			return false;
 	}
 	return false;
 }
 
-bool leftmostInterval(float u, float lamda){
+bool leftmostInterval(float u, float lamda, bool debug){
 	float h = 0.5*log(2) + 2.5*(log(M_PI)-log(lamda)) - pow(M_PI,2)/(2*lamda) + 0.5*lamda;
 	float lU = log(u);
 	float z=1;
@@ -66,34 +75,67 @@ bool leftmostInterval(float u, float lamda){
 	while(true){
 		j=j+1;
 		z = z - k*pow(x,pow(j,2)-1);
-		if(h+log(z)>lU)
+		if(h+log(z)>lU){
+//			cout<<"returned true"<<endl;
 			return true;
+		}
 		j=j+1;
 		z = z + pow(j+1,2)*pow(x,pow(j+1,2)-1);
-		if(h+log(z)<lU)
+		if(debug){
+			cout<< "In LEFT Z: "<<z<<endl;
+			cout<< "In LEFT x: "<<x<<endl;
+			cout<< "In LEFT k: "<<k<<endl;
+			cout<< "In LEFT h: "<<h<<endl;
+			cout<< "In LEFT lamda: "<<lamda<<endl;
+			cout<< "In LEFT lU: "<<lU<<endl;
+		}
+		if(h+log(z)<lU){
+//			cout<<((h+log(z))<lU)<<"return false================================"<<endl;
 			return false;
+		}
 	}
 }
 
-float sampleFromKSmodified(float r){
+float sampleFromKSmodified(float r, bool debug){
 	float lamda;
 	bool flag = false;
+	r=abs(r);
+	if(r<R_THRESH)
+		return LAMBDA_CONST;
+//	if(r==0)
+//		r=numeric_limits<float>::min()*10;	// In leftmostInterval we have 0.5*lamda
+	int iter=0;
 	while(!flag){
+//		if(iter>ITER_THRESH)
+//			return 1.0;
+
 		float y=getNormalSample(0,1);
+		if(debug)
+			cout<< "In KS y1: "<<y<<endl;
 		y=pow(y,2);
+		if(debug)
+			cout<< "In KS y2: "<<y<<endl;
+//		cout<<4*r+y<<
 		y=1+((y-sqrt(y*(4*r+y)))/(2*r));
+		if(debug)
+			cout<< "In KS y3: "<<y<< r<<endl;
+		if(y<=0)
+			continue;
 		float u = getUniformZeroOne();
+
 		if(u<=1/(1+y))
 			lamda = r/y;
 		else
 			lamda=r*y;
 		// lamda being drawn from GIG(0.5,1,^2);
-
+//		cout<< "In KS lamda, y: "<<lamda<<y<<endl;
 		if(lamda>4.0/3)
-			flag = rightmostInterva(u,lamda);
+			flag = rightmostInterval(u,lamda,debug);
 		else
-			flag = leftmostInterval(u,lamda);
+			flag = leftmostInterval(u,lamda,debug);
+		iter++;
 	}
+	return lamda;
 }
 
 void read_data_fast(string &filename, fmat &X, fmat &Y, int N, int d_aug) {
@@ -131,7 +173,7 @@ void read_data_fast(string &filename, fmat &X, fmat &Y, int N, int d_aug) {
     Y(i,0) = label;
   }
 
-//  Y = (Y + 1)/2;  // change from {-1,1} to {0,1}.
+  Y = (Y + 1)/2;  // change from {-1,1} to {0,1}.
 
   final = clock() - init;
   int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
@@ -143,10 +185,11 @@ void read_data_fast(string &filename, fmat &X, fmat &Y, int N, int d_aug) {
 
 float getzSample(float mean, float var, float y){
 	float z;
-	boost::mt19937 rng; // I don't seed it on purpouse (it's not relevant)
+	static boost::mt19937 rng; // I don't seed it on purpouse (it's not relevant)
 	boost::normal_distribution<> nd(mean, var);
 	boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > var_nor(rng, nd);
 	float sample = var_nor();
+//	cout<<"screwed var_nor "<<sample<<endl;
 	if(y==1.0)
 		z = sample*((sample>0)? 1:0);
 	else
@@ -164,7 +207,7 @@ fmat getZSample(fmat Mean, fmat Var, fmat Y){
 
 fmat getNormalMatSample(fmat Mean, fmat Var){
 	unsigned int rows = Mean.n_rows;
-	boost::mt19937 rng; // I don't seed it on purpouse (it's not relevant)
+	static boost::mt19937 rng; // I don't seed it on purpouse (it's not relevant)
 	fmat Z(rows,1);
 	for(int i=0;i<rows;i++){
 		boost::normal_distribution<> nd(Mean(i,0), Var(i,0));
@@ -205,6 +248,7 @@ fmat getLogisticCoeffs(fmat X, fmat Y){
 	for(int i=0; i<NUM_SAMPLES; i++){
 		cout<<"iter "<<i<<endl;
 //		cout<<"v/(REGULARIZATION^2) "<<endl<<v/(REGULARIZATION^2)<<endl;
+		cout<<"det(Lamda)"<<det(Lamda)<<endl;
 		fmat intermediateMat = trans(X)*inv(Lamda)*X + v/(pow(REGULARIZATION,2));
 		cout<<"det(intermediateMat) "<<det(intermediateMat)<<endl;
 		V = inv(intermediateMat);	//optimize inverses p><p
@@ -214,6 +258,11 @@ fmat getLogisticCoeffs(fmat X, fmat Y){
 //		cout<<"==HELLO1=="<<endl;
 		B=S*inv(Lamda)*Z;				//p><1
 //		cout<<"==HELLO2=="<<endl;
+//		if(i==37){
+//			cout<<"trans(B) "<<trans(B)<<endl;
+//			cout<<"Lamda.diag() "<<trans(Lamda.diag())<<endl;
+//		}
+
 		for(int j=0; j<rows; j++){
 			float z_old = Z(j,0);
 			fmat x_j = reshape(conv_to<fmat>::from(X.row(j)),1,cols);
@@ -225,18 +274,45 @@ fmat getLogisticCoeffs(fmat X, fmat Y){
 			float var =Lamda(j,j)*(w_j+1);
 			Z(j,0) = getzSample(mean,var,Y(i,0));
 			B = B + ((Z(j,0)-z_old)/Lamda(j,j))*s_j;
+//			if(i==37){
+//
+//				cout<< " z_old, h_j, w_j, mean, Lamda(j,j) "<<z_old<<" "<< h_j<<" "<<w_j<<" "<<mean<<" "<<Lamda(j,j);
+//			}
 		}
 		// draw beta vals
 		T = getNormalMatSample(zeros<fmat>(cols,1),ones<fmat>(cols,1));
+//		if(i==52){
+//			cout<<"T "<<T<<endl;
+//			cout<<"B "<<B<<endl;
+//			cout<<"L "<<L<<endl;
+//		}
 //		cout<<"==HELLO3=="<<endl;
 		beta.row(i) = trans(B + L*T);
 //		cout<<"==HELLO4=="<<endl;
-		cout<<"SAMPLE # "<<i<<" "<<norm(beta.row(i),2)<<endl;
+		cout<<"SAMPLE # "<<i<<" "<<norm(beta.row(i),2)<<", total samples "<<NUM_SAMPLES<<endl;
+//		cout<<"beta "<<beta.row(i)<<endl;
 		// new values for mixing variances
+		bool debug = false;
 		for(int j=0; j<rows; j++){
 			float r_j = Z(j) - accu(X.row(j)%beta.row(j));
-			Lamda(j,j) = sampleFromKSmodified(r_j);
+			if(i==36 && j==17){
+				cout<<"j, r_j "<<j<<", "<<r_j<<endl;
+				debug=true;
+			}
+			if(r_j!=0)
+				Lamda(j,j) = sampleFromKSmodified(r_j,debug);
+			else
+				Lamda(j,j) = LAMBDA_CONST;
+//			if(i==51)
+//				cout<<"51 Lamda(j,j): "<<Lamda(j,j)<<endl;
+			if(i==36 && j==17){
+				cout<<"j, r_j "<<j<<", "<<r_j<<endl;
+				cout<<"36 Lamda(j,j): "<<Lamda(j,j)<<endl;
+//				debug=true;
+			}
+			debug=false;
 		}
+
 	}
 
 	return beta;
