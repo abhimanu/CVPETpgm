@@ -1,0 +1,99 @@
+\documentclass[a4paper, 10pt]{article}
+
+\usepackage{nips12submit_e, times}
+\usepackage{hyperref}
+
+\title{An Empirical Study of Approximation Inference Algorithms on Bayesian Logistic Regression}
+
+\author{
+Wei Dai \\
+School of Computer Science \\
+Carnegie Mellon University\\
+Pittsburgh, PA 15213\\
+\texttt{wdai@cs.cmu.edu}\\
+\And
+Abhimanu Kumar \\
+School of Computer Science \\
+Carnegie Mellon University\\
+Pittsburgh, PA 15213\\
+\texttt{abhimank@cs.cmu.edu}\\
+\And
+Jinliang Wei \\
+School of Computer Science \\
+Carnegie Mellon University\\
+Pittsburgh, PA 15213\\
+\texttt{jinlianw@cs.cmu.edu}\\
+}
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\nipsfinalcopy
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\begin{document}
+\maketitle
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+\vspace{-20pt}
+\section{The Variational Approach}
+We study a variational approach presented by Jaakkola et al.\cite{Jaakkola96avariational}. In this section, we briefly describe the variational method for approximate inference for Bayesian logistic regression. The description closely follows Jaakola's paper.
+
+Consider a logistic regression model given by 
+\begin{align}
+  P(s|pa, \theta) &= g((2s - 1)\sum_j\theta_jx_j)
+\end{align}
+where $g(x) = (1 + e^{-x})^{-1}$ is the sigmoid function, $s \in \{0, 1\}$ is the binary class label, and $pa = \{x_1, x_2, ... x_n\}$ is the set of variables to classify. The uncertainty of the parameter values is represented by a prior distribution $P(\theta)$.
+
+Instead of finding the most likely $\theta$ to use, here we do Bayesian inference. The full conditional probability distribution is
+\begin{align}
+P(s|pa) &= \int P(s|pa, \theta)P(\theta)d\theta
+\end{align}
+
+For computing $P(s|pa)$, we need $P(\theta)$ which is computed as the posterior distribution $P(\theta| D^1, D^2, ..., D^T)$, where $D^{(t)} = \{s^{(t)}, x^{(t))}_1, x^{(t))}_2, ..., x^{(t))}_n\}$ is a complete observation. 
+
+It is not feasible to compute this posterior exactly, but it is possible to find a variational transformation of $P(s|pa)$ such that the desired posterior can be computed in closed form. The transformation can be computed from a single observation. Also, under variational approximation the parameter posterior remains Gaussian, and thus the full posterior can be obtained by sequantially absorbing the evidence from each of the observations.
+
+The variational approximation used is given by
+\begin{align}
+  P(s|pa) &= g(X_s) \leq g(\xi)exp\{(X_s - \xi)/2 + \lambda(\xi)(X_s^2 - \xi^2)\}\\
+  &= P(s|pa, \theta, \xi)
+\end{align}
+where $X_s = (2s - 1)\sum_j\theta_jx_j$ and $\lambda(\xi) = [1/2 - g(\xi)]/(2\xi)$.
+
+The posterior $P(\theta|D)$ can be computed by normalizing the left hand side of the following equation.
+\begin{align}
+\label{eq:variational}
+P(s|pa)P(\theta) &\leq P(s|pa, \theta, \xi)P(\theta)
+\end{align}
+
+Since this normalization is not feasible in practice we normalize the variational distribution instead. As the prior distribution is a Gaussian with mean $\mu$ and covariance matrix $\Sigma$, computing the variational posterior - absorbing evidence - amounts to updating the mean and the covariance matrix. 
+
+Omitting the algebra this update yields 
+\begin{align}
+\label{eq:sigma_update}
+\Sigma^{-1}_{post} &= \Sigma^{-1} + 2|\lambda(\xi)|xx^T\\
+\label{eq:mu_update}
+\mu_{post} &= \Sigma_{post}[\Sigma^{-1}\mu + (s - 1/2)x]
+\end{align}
+where $x = [x_1 ...x_n]^T$. 
+
+Now, the posterior covariance matrix depends on the variational parameter $\xi$ through $\lambda(\xi)$ and thus its value needs to be obtained. We obtain $\xi$ by optimizing the approximation in eq. (\ref{eq:variational}). A fast EM algorithm is devised to perform this optimization. This leads to a closed form update for $\xi$ given by 
+\begin{align}
+\label{eq:xi}
+\xi^2 = E\{(\sum_j\theta_jx_j)^2\} &= x^T\Sigma_{post}x + (x^T\mu_{post})^2
+\end{align}
+
+where the expectation is taken with respect to $P(\theta|D, \xi^{old})$, the variational posterior distribution based on the previous vaue of $\xi$. Alternating between eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}) monotonically improves the posterior approximation of eq. (\ref{eq:variational}).
+
+The predictive likelihoods $P(s^t | pa_t, \mathcal{D})$ for any complete observation $D^t$ is given by
+\begin{align}
+  logP(s^t|pa_t, \mathcal{D}) = logg(\xi_t) - \xi_t/2 - \lambda(\xi_t)\xi_t^2 - \frac{1}{2}\mu^T\Sigma^{-1}\mu + \frac{1}{2}\mu^T_t\Sigma^{-1}_t\mu_t + \frac{1}{2}log\frac{|\Sigma_t|}{|\Sigma|}
+\end{align}
+where $\mu$ and $\Sigma$ signify the parameters in $P(\theta)$ and the subscript t refers to the posterior $P(\theta|\mathcal{D}, D^t)$ found by absorbing the evidence in $D^t$.
+
+We implemented this algorithm, mainly eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The code does not yet converge. Since the algorithm involves several covariance matrix inversions, when the dataset contains large number of features, the algorithm runs very slowly.
+\bibliographystyle{plain}
+\bibliography{reference}
+\end{document}
