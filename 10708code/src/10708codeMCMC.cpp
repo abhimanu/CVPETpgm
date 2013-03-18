@@ -19,7 +19,7 @@ using namespace arma;
 using namespace std;
 
 #define NUM_SAMPLES 10000
-#define REGULARIZATION 20
+#define REGULARIZATION 30
 #define ITER_THRESH 20
 #define R_THRESH 1e-4
 #define LAMBDA_CONST 1.0
@@ -373,7 +373,7 @@ int main() {
 	cout<<num_rows<<endl<<num_cols<<endl<<X(0,num_cols-1)<<endl<<X(0,num_cols-2)<<endl;
 	cout<<Y(0,0)<<Y(1,0)<<Y(2,0)<<Y(3,0)<<Y(4,0)<<Y(5,0)<<endl;
 	cout<<"accu(X.col(0))"<<accu(X.col(0))<<endl;
-	X=X.cols(0,10);
+	X=X.cols(0,100);
 	fmat combinedMat=throwAwayZeroRows(X, Y);
 	X = combinedMat.cols(0,combinedMat.n_cols-2);
 	Y = combinedMat.col(combinedMat.n_cols-1);

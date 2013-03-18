@@ -147,6 +147,8 @@ int main(){
 	c.eye();
 	c=c*REGULARIZATION;
 	cout<<c<<endl<<1.0/pow(2,10);
+	cout<<log(M_PI)<<endl;
+	cout<<numeric_limits<float>::min()<<endl;
 //	cout<<log(10e-323)<<endl;
 
 //	cout<<*(p)<<*(p++)<<*(p++)<<test_mat(test_mat.n_elem-1)<<endl;
