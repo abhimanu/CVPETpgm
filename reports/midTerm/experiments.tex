@@ -25,12 +25,17 @@ URL Reputation dataset\footnotemark[1] & 2,396,130 (16000) & 3,231,961 (74113) \
 
 \footnotetext[1]{The dataset is too large so we used only one day of data out of totally 121 days in the dataset. See number in parentheses for specifications.}
 
-\subsection{results}
+\subsection{Results}
+
 \subsubsection{MCMC based estimation}
 Our MCMC sampling strategy that we described in section~\ref{sec:MCMCmethod}
-converges. Here is a plot of the iterations of the Markov chain for estimation
-of Farms Ads dataset. This is for MLE estimation without any priors. 
+converges. Figure~\ref{fig:MCMCconverge} is a plot of the iterations of the Markov 
+chain for estimation on a subset of Farms Ads dataset. This is for MLE
+estimation without any priors. We also 
 
-\begin{figure}
-\includegraphics[width=0.5\textwidth]{samplingConvergence.png}
+\begin{figure}![htb]
+\includegraphics[width=1\textwidth]{samplingConvergence.png}
+\caption{Markov chain convergence on Farms ads data. We take a sub-sample of
+the dataset: 2000 rows and 100 columns}
+\label{fig:MCMCconverge}
 \end{figure}
