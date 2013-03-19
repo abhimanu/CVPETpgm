@@ -1,8 +1,8 @@
 
 midterm: midterm.tex reference.bib intro.tex related_work.tex method.tex experiments.tex conclusion.tex
-	latex midterm.tex
+	pdflatex midterm.tex
 	bibtex midterm
-	latex midterm.tex
+	pdflatex midterm.tex
 	pdflatex midterm.tex
 	rm *.log *.aux *.bbl *.blg *.dvi *.out
 
