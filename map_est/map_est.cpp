@@ -25,9 +25,8 @@ DEFINE_int32(max_iter, 500, "maximum number of iterations in gradient descent.")
 DEFINE_int32(Ntrain, 0, "number of training data instances.");
 DEFINE_int32(Ntest, 0, "number of test data instances.");
 DEFINE_int32(d, 0, "data dimension.");
-
-DEFINE_int32(labelC1, -2, "class 1 label.");
-DEFINE_int32(labelC2, -2, "class 2 label.");
+DEFINE_int32(labelC1, -2, "class 1 label.");  // The rest will be class 2.
+DEFINE_bool(save_binary, false, "save Armadillo binary after loading the data.");
 
 
 using namespace arma;
@@ -36,6 +35,8 @@ using namespace arma;
 void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w, 
     double sigma, int n_init);
 void read_data(string &filename, fmat &X, icolvec &Y, int &N, int &d);
+void read_data_rand_sep(string &filename, fmat &Xtrain, icolvec &Ytrain, 
+    fmat &Xtest, icolvec &Ytest, int &N, int &d);
 void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug);
 double classification_error(const fmat &Xtest, const icolvec &Ytest, 
     const fcolvec &w);
@@ -46,11 +47,23 @@ int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   icolvec Ytrain;
+  //icolvec Ytrain2;
   //int Ntrain, d;
   fmat Xtrain;
-  //read_data(FLAGS_trainfile, Xtrain, Ytrain, Ntrain, d);
+  //fmat Xtrain2;
+  //int Ntrain2, d2;
+  //string s = "../dataset/farm_ads_train.csv";
+  //read_data(s, Xtrain2, Ytrain2, Ntrain2, d2);
   int Ntrain = FLAGS_Ntrain, d_aug = FLAGS_d + 1;
   read_data_fast(FLAGS_trainfile, Xtrain, Ytrain, Ntrain, d_aug);
+  
+  // compare the two Xtrain
+  //cout << "diff Xtrain = " << as_scalar(accu(Xtrain - Xtrain2)) << endl;
+
+  if (FLAGS_save_binary) {
+    Xtrain.save(FLAGS_trainfile + ".X.arm");
+    Ytrain.save(FLAGS_trainfile + ".Y.arm");
+  }
 
   fcolvec w(d_aug);
   wmap_grad_desc(Xtrain, Ytrain, w, FLAGS_sigma, FLAGS_n_init);
@@ -65,6 +78,10 @@ int main(int argc, char** argv) {
   icolvec Ytest;
   //read_data(FLAGS_testfile, Xtest, Ytest, Ntest, d);
   read_data_fast(FLAGS_testfile, Xtest, Ytest, Ntest, d_aug);
+  if (FLAGS_save_binary) {
+    Xtest.save(FLAGS_testfile + ".X.arm");
+    Ytest.save(FLAGS_testfile + ".Y.arm");
+  }
   
   double test_error = classification_error(Xtest, Ytest, w);
   cout << "classification error = " << test_error << endl;
@@ -82,6 +99,7 @@ int main(int argc, char** argv) {
  * X - [N x d+1] augmented design matrix. X[:,1] = 1.
  */
 void read_data(string &filename, fmat &X, icolvec &Y, int &N, int &d) {
+  cout << "Start slow reading " << filename << endl;
   fmat m;    // temporary variable
   
   clock_t init, final;  // record the file reading time.
@@ -107,16 +125,89 @@ void read_data(string &filename, fmat &X, icolvec &Y, int &N, int &d) {
     << time_elapsed << " seconds. *****" << endl;
 }
 
+
+/**
+ * Read and create Xtest.
+ */
+void read_data_rand_sep(string &filename, fmat &Xtrain, icolvec &Ytrain, 
+    fmat &Xtest, icolvec &Ytest, int &N, int &d) {
+  cout << "Start slow reading " << filename << endl;
+  fmat m;    // temporary variable
+  
+  clock_t init, final;  // record the file reading time.
+  init = clock();
+
+  m.load(filename);
+  N = m.n_rows;
+  d = m.n_cols; // last column is class label, but we augment it.
+
+  int NC1 = 0, NC2;
+  for(int i = 0; i < N; i++) {
+    NC1 += ((int) as_scalar(m(i, d-1)) == FLAGS_labelC1) ? 1 : 0;
+  }
+  NC2 = n - NC1;
+
+  fmat m_c1, m_c2; // m_c1 contains FLAGS_labelC1, m_c2 the rest.
+  m_c1.resize(NC1, d);
+  m_c2.resize(NC2, d);
+
+  int i1 = 0, i2 = 0;
+  for(int i = 0; i < N; i++) {
+    if ((int) as_scalar(m(i, d-1)) == FLAGS_labelC1) {
+      m_c1.row(i1++) = m.row(i);
+    } else {
+      m_c2.row(i2++) = m.row(i);
+    }
+  }
+
+  shuffle(m_c1, 0); // shuffle rows
+  shuffle(m_c2, 0); // shuffle rows
+
+  int Ntrain_C1 = (int) NC1 * 0.8;
+  int Ntrain_C2 = (int) NC2 * 0.8;
+  int Ntrain = Ntrain_C1 + Ntrain_C2;
+
+  int Ntest_C1 = NC1 - Ntrain_C1;
+  int Ntest_C2 = NC2 - Ntrain_C2;
+  int Ntest = Ntest_C1 + Ntest_C2;
+
+  Xtrain.resize(Ntrain, d);
+  Xtrain.ones();
+  Ytrain.resize(Ntrain);
+  Xtest.resize(Ntest, d);
+  Xtest.ones();
+  Ytest.resize(Ntest);
+
+
+
+  X.resize(N, d);
+  X.ones();
+  X.cols(1, d-1) = m.cols(0, d-2);  // first row of X is 1's.
+
+  Y.resize(N);
+  Y = conv_to<icolvec>::from(m.col(d-1));
+  Y = (Y + 1)/2;  // change from {-1,1} to {0,1}.
+  
+  final = clock() - init;
+  int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
+
+  cout << "***** Done reading " << filename << ". N = " << N 
+    << ", d = " << d << ". Total time = " 
+    << time_elapsed << " seconds. *****" << endl;
+}
+
 /**
  * filename needs to be space delimited, not csv, and need prior knowledge
  * of N and d (augmented).
  */
 void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
+  cout << "Start fast reading " << filename << endl;
   clock_t init, final;  // record the file reading time.
   init = clock();
 
   // For multi-class, we'll have < N instances.
   X.resize(N, d_aug);
+  X.ones(); // make sure the first column is 1.
   Y.resize(N);
 
   ifstream indata;
@@ -134,9 +225,10 @@ void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
   }
   int label;
   indata >> label;  // reading class label 
-  Y(0) = label;
+  Y(0) = (label == FLAGS_labelC1) ? 0 : 1;
 
-  for(int i = 1; !indata.eof() && i < N; i++) {
+  int i;
+  for(i = 1; !indata.eof() && i < N; i++) {
     for (int j = 1; j < d_aug; j++) { // read first line
       // read attributes
       float attr;
@@ -144,11 +236,14 @@ void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
       X(i, j) = attr;
     }
     indata >> label;  // reading class label 
-    Y(i) = label;
+    Y(i) = (label == FLAGS_labelC1) ? 0 : 1;
   }
-  
-  Y = (Y + 1)/2;  // change from {-1,1} to {0,1}.
 
+  if (i < N) {
+    cerr << "Warning: expected " << N << 
+    " data instances, but only got " << i << endl;
+  }
+ 
   final = clock() - init;
   int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
 
@@ -156,6 +251,7 @@ void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
     << ", d = " << d_aug << ". Total time = " 
     << time_elapsed << " seconds. *****" << endl;
 }
+
 
 
 void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w, 
@@ -178,8 +274,10 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
 
   int i;
   for(i = 0; change_w > thresholdSq && i < FLAGS_max_iter; i++) {
-  //for(int i = 0; i < 1; i++) {
-    if (i % 10 == 0) cout << "grad desc: iteration " << i << endl;
+    if (i % 10 == 0) {
+      cout << "grad desc: iteration " << i << 
+      " ||w||^2_2 = " << as_scalar(sum(w.t() * w)) << endl;
+    }
 
     fcolvec update_w(d);
     update_w.zeros();
