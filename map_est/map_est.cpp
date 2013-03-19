@@ -35,8 +35,6 @@ using namespace arma;
 void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w, 
     double sigma, int n_init);
 void read_data(string &filename, fmat &X, icolvec &Y, int &N, int &d);
-void read_data_rand_sep(string &filename, fmat &Xtrain, icolvec &Ytrain, 
-    fmat &Xtest, icolvec &Ytest, int &N, int &d);
 void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug);
 double classification_error(const fmat &Xtest, const icolvec &Ytest, 
     const fcolvec &w);
@@ -125,77 +123,6 @@ void read_data(string &filename, fmat &X, icolvec &Y, int &N, int &d) {
     << time_elapsed << " seconds. *****" << endl;
 }
 
-
-/**
- * Read and create Xtest.
- */
-void read_data_rand_sep(string &filename, fmat &Xtrain, icolvec &Ytrain, 
-    fmat &Xtest, icolvec &Ytest, int &N, int &d) {
-  cout << "Start slow reading " << filename << endl;
-  fmat m;    // temporary variable
-  
-  clock_t init, final;  // record the file reading time.
-  init = clock();
-
-  m.load(filename);
-  N = m.n_rows;
-  d = m.n_cols; // last column is class label, but we augment it.
-
-  int NC1 = 0, NC2;
-  for(int i = 0; i < N; i++) {
-    NC1 += ((int) as_scalar(m(i, d-1)) == FLAGS_labelC1) ? 1 : 0;
-  }
-  NC2 = n - NC1;
-
-  fmat m_c1, m_c2; // m_c1 contains FLAGS_labelC1, m_c2 the rest.
-  m_c1.resize(NC1, d);
-  m_c2.resize(NC2, d);
-
-  int i1 = 0, i2 = 0;
-  for(int i = 0; i < N; i++) {
-    if ((int) as_scalar(m(i, d-1)) == FLAGS_labelC1) {
-      m_c1.row(i1++) = m.row(i);
-    } else {
-      m_c2.row(i2++) = m.row(i);
-    }
-  }
-
-  shuffle(m_c1, 0); // shuffle rows
-  shuffle(m_c2, 0); // shuffle rows
-
-  int Ntrain_C1 = (int) NC1 * 0.8;
-  int Ntrain_C2 = (int) NC2 * 0.8;
-  int Ntrain = Ntrain_C1 + Ntrain_C2;
-
-  int Ntest_C1 = NC1 - Ntrain_C1;
-  int Ntest_C2 = NC2 - Ntrain_C2;
-  int Ntest = Ntest_C1 + Ntest_C2;
-
-  Xtrain.resize(Ntrain, d);
-  Xtrain.ones();
-  Ytrain.resize(Ntrain);
-  Xtest.resize(Ntest, d);
-  Xtest.ones();
-  Ytest.resize(Ntest);
-
-
-
-  X.resize(N, d);
-  X.ones();
-  X.cols(1, d-1) = m.cols(0, d-2);  // first row of X is 1's.
-
-  Y.resize(N);
-  Y = conv_to<icolvec>::from(m.col(d-1));
-  Y = (Y + 1)/2;  // change from {-1,1} to {0,1}.
-  
-  final = clock() - init;
-  int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
-
-  cout << "***** Done reading " << filename << ". N = " << N 
-    << ", d = " << d << ". Total time = " 
-    << time_elapsed << " seconds. *****" << endl;
-}
-
 /**
  * filename needs to be space delimited, not csv, and need prior knowledge
  * of N and d (augmented).
@@ -251,7 +178,6 @@ void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
     << ", d = " << d_aug << ". Total time = " 
     << time_elapsed << " seconds. *****" << endl;
 }
-
 
 
 void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w, 
