@@ -47,7 +47,7 @@ form, but by approximating the logistic sigmoid function with probit function,
 we recover $\bm{w}_{MAP}$ as the decision boundary.
 
 \subsection{The Variational Approach}
-We study a variational approach presented by Jaakkola et al.\cite{Jaakkola96avariational}. In this section, we briefly describe the variational method for approximate inference for Bayesian logistic regression. The description closely follows Jaakola's paper.
+We study a variational method presented by Jaakkola et al.\cite{Jaakkola96avariational}. In this section, we briefly describe the variational method for approximate inference for Bayesian logistic regression. The description closely follows Jaakola's paper.
 
 Consider a logistic regression model given by 
 \begin{align}
@@ -55,7 +55,7 @@ Consider a logistic regression model given by
 \end{align}
 where $g(x) = (1 + e^{-x})^{-1}$ is the sigmoid function, $s \in \{0, 1\}$ is the binary class label, and $pa = \{x_1, x_2, ... x_n\}$ is the set of variables to classify. The uncertainty of the parameter values is represented by a prior distribution $P(\theta)$.
 
-Instead of finding the most likely $\theta$ to use, here we do Bayesian inference. The full conditional probability distribution is
+Instead of finding the most likely $\theta$ to use as in logistic regression, here we do Bayesian inference. The full conditional probability distribution is
 \begin{align}
 P(s|pa) &= \int P(s|pa, \theta)P(\theta)d\theta
 \end{align}
@@ -102,4 +102,4 @@ The predictive likelihoods $P(s^t | pa_t, \mathcal{D})$ for any complete observa
 \end{align}
 where $\mu$ and $\Sigma$ signify the parameters in $P(\theta)$ and the subscript t refers to the posterior $P(\theta|\mathcal{D}, D^t)$ found by absorbing the evidence in $D^t$.
 
-We implemented this algorithm, mainly eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The code does not yet converge. Since the algorithm involves several covariance matrix inversions, when the dataset contains large number of features, the algorithm runs very slowly.
+We implemented this algorithm, mainly the updating rules in eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The code does not yet converge. Since the algorithm involves several covariance matrix inversions, when the dataset contains large number of features, the algorithm runs very slowly right now.
