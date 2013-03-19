@@ -135,7 +135,7 @@ void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
   for(int i = 1; !indata.eof() && i < N; i++) {
     for (int j = 1; j < d_aug; j++) { // read first line
       // read attributes
-      int attr;
+      float attr;
       indata >> attr;
       X(i, j) = attr;
     }
@@ -175,7 +175,7 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
   int i;
   for(i = 0; change_w > thresholdSq && i < FLAGS_max_iter; i++) {
   //for(int i = 0; i < 1; i++) {
-    cout << "grad desc: iteration " << i << endl;
+    if (i % 10 == 0) cout << "grad desc: iteration " << i << endl;
 
     fcolvec update_w(d);
     update_w.zeros();
