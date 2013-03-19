@@ -26,6 +26,9 @@ DEFINE_int32(Ntrain, 0, "number of training data instances.");
 DEFINE_int32(Ntest, 0, "number of test data instances.");
 DEFINE_int32(d, 0, "data dimension.");
 
+DEFINE_int32(labelC1, -2, "class 1 label.");
+DEFINE_int32(labelC2, -2, "class 2 label.");
+
 
 using namespace arma;
 
@@ -112,6 +115,7 @@ void read_data_fast(string &filename, fmat &X, icolvec &Y, int N, int d_aug) {
   clock_t init, final;  // record the file reading time.
   init = clock();
 
+  // For multi-class, we'll have < N instances.
   X.resize(N, d_aug);
   Y.resize(N);
 

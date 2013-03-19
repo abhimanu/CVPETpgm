@@ -1,0 +1,188 @@
+\section{Methods}
+Given data set $\{\phib_n, t_n\}_{n=1}^N$ where $\phib_n$ are the feature
+vectors and $t_n\in \{0,1\}$ are the labels, we can write the likelihood
+function for logistic regression as $p(\bm{t}|\bm{w}) = \prod_{n=1}^N
+y_n^{t_n} (1-y_n)^{1-t_n}$ where $\bm{t} = (t_1,...,t_N)^T$ and
+$y_n=p(\mathcal{C}_1|\phib_n) = \sigma(\bm{w}^T \phib_n)$ and $\sigma(s) =
+\frac{1}{1+e^{-s}}$. Using Bayes rule, the posterior distribution over
+$\bm{w}$ is $p(\bm{w}|\bm{t}) = \frac{p(\bm{w}) p(\bm{t}|\bm{w})}{p(\bm{t})}$
+where $p(\bm{t}) = \int p(\bm{w})p(\bm{t}|\bm{w}) d\bm{w}$ involves logistic
+sigmoid functions and is intractable. In the sequel we briefly describe three
+approximation schemes (Laplace approximation, variational methods, and Gibbs
+sampling), and point estimations (MLE, MAP) together with the associated
+prediction rules.
+
+\subsection{Markov Chain Monte Carlo approximation}
+\label{sec:MCMCmethod}
+Let us first discuss the simple bayesian binary probit regression model and 
+then we will ease into bayesian logistic regression. We follow the lead of
+the work done by Holmes et al.~\cite{Holmes}. Let $\psi$ denotes the gaussian
+cdf, binary probit regression's likelihood is:
+\begin{equation}
+\pi(y_i=1|x_i) = \psi(x_i^Tw)
+\end{equation}
+
+We define a set of n auxiliary variables $z_i$ as there is no cojugate prior to
+the gaussian cdf as:
+\begin{equation}
+z_i=x_i^Tw+\epsilon_i
+\end{equation}
+
+and $\epsilon_i \sim N(0,1)$, and if $z_i>0$ then $y_i=1$ and vice-versa.
+Removing w from likelihood in this new model makes the model more amenable
+to sampling. For this
+specific case of  Normal prior over w, this model has a simple
+Gibbs sampling updates where $z_i$ is drawn from independent 
+truncated Normal distributions, and w is drwn from a multvariate Normal
+distribution. Formally, a easy-to-follow Gibbs sampling scheme with
+$\pi(w)\sim N(b,v)$ can be obtained using the following:
+\begin{eqnarray}
+z_i|w \propto N(x_i^Tw,1)I(z_i>0)y_i=1 \\
+z_i|w \propto N(x_i^Tw,1)I(z_i\leq 0)y_i\neq 0 \\
+w|z,y \sim N(B,V) \\
+B = V(v^{-1}b+X^Tz) \\
+V=(v^{-1}+X^TX)^-1 \\
+\end{eqnarray}
+
+This simple Gibbs sampling strategy is poor in performance because the
+components of w are strongly correlated with the components of z. To remove this
+we sample w and z together through the use of the product rule:
+\begin{equation}
+\pi(w,z|y) = \pi(z|y)*\pi(w|z)
+\end{equation}
+
+This method draws every $z_i$ from a Normal distribution that has means
+and variances obtained using a leave-one-out marginal predictive density,
+and these conditional means are updated after each draw of $z_i$.
+Later we sample w from its conditional gaussian after all of the
+$z_i$ have been drawn. 
+
+\subsubsection{Binary Logistic Regression}
+Starting from the binary Bayesian probit regression model explained before , we
+propose to obtain updates for binary Bayesian logistic regression by
+substituting the independent Normal 
+prior over $\epsilon$ with independent logistic. 
+This significantly alters the simple sampling scheme we described earlier. To
+obtain a simple sampling strategy of the new model we define an addtional group
+of auxiliary variables $λ_{1:n}$ along side modifying the noise function to get
+a scale mixture of gaussians with marginal densities as logistic distribution,
+(here KS is the Kolmogorov-Smirnov distribution):
+\begin{eqnarray}
+\epsilon_i \sim N(0,\lambda_i) \\
+\lambda_i = (2\nu_i)^2 \\
+\nu_i \sim KS \\
+\end{eqnarray}
+
+If one takes $\lambda$ to be  constant, then this is identical to the
+Probit model above. Though each value of $z_i$ contains an individual term i for
+its noise variance now. Moreover, the greatest advantage is that we know the way
+to draw samples from this model given fixed $\lambda$ . We just have to use
+weighted least squares rather than least squares (and teh related inverse of the 
+hessian matrix), and then just draw from individual truncated gaussain of
+different variance parameters. After this, we are in a poition to write a
+Gibbs sampler given that we will be able to sample from the KS distribution.
+\cite{Holmes} provides rejection sampling technique to draw samples 
+from the KS distribution via the Generalized Inverse Gaussian distibution as the
+sampling density. Using this, we write a simple Gibbs sampler for this
+logistic regression setting as follows:
+
+\begin{eqnarray}
+z_i|w,\lambda \propto N(x_i^Tw,\lambda_i)I(z_i>0)~if~y_i=1 \\
+z_i|w,\lambda \propto N(x_i^Tw,\lambda_i)I(z_i\leq 0)~if~y_i\neq 0 \\
+w|z,y.\lambda \sim N(B,V) \\
+B = V(v^{-1}b+X^TWz) \\
+V=(v^{-1}+X^TWX)^{-1} \\
+W=diag(\lambda^{-1}) \\
+\end{eqnarray}
+
+\subsection{Laplace Approximation and associated MAP}
+
+Laplace approximation approximate the posterior $p(\bm{w}|\bm{t})$ with a
+multivariate Guassian $\mathcal{N}(\bm{w}; \bm{w}_{MAP}, \bm{S}_N)$ where
+$\bm{w}_{MAP}$ is the maximum {\it a posteriori} and thus a mode of the
+posterior and $\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln
+p(\bm{w}|\bm{t})|_{\bm{w} = \bm{w}_{MAP}}$ is the Hessian at $\bm{w}_{MAP}$.
+Since we are approximating the posterior with Gaussian, it is convenient to
+use conjugate prior $p(\bm{w}) = \mathcal{N}(\bm{w};\bm{m}_0,\bm{S}_0)$. Thus
+we have $\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
+\bm{S}_0^{-1}(\bm{w}-\bm{m}_0) + \sum_{n=1}^N\{t_n \ln y_n +(1-y_n) \ln
+(1-y_n)\} + const$
+
+Under the Laplace approximation and the conjugated Gaussian prior, $\bm{w}_{MAP}$
+can be efficiently obtained by gradient descent. To encourage small
+$||w||^2_2$, let $\bm{m}_0 = \bm{0}$, and $\bm{S}_0 = \sigma^2 \bm{I}$, we
+have the following gradient descent rule: 
+
+\begin{equation}
+\bm{w}_t \leftarrow \bm{w}_{t-1} + \eta\left( \sum_{n=1}^N (t_n - y_{n,(t-1)}) \phib_n -
+\frac{1}{\sigma^2}\bm{w}_{t-1} \right)
+\end{equation}
+
+where $\eta$ is the learning rate constant. We can also get
+
+\begin{equation}
+\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln p(\bm{w}|\bm{t})
+= \bm{S}_0^{-1} + \sum_{n=1}^N y_n(1-y_n) \phib_n \phib_n^T
+\end{equation}
+
+The predictive distribution for Laplace-approximated posterior is not close
+form, but by approximating the logistic sigmoid function with probit function,
+we recover $\bm{w}_{MAP}$ as the decision boundary.
+
+\subsection{The Variational Approach}
+We study a variational method presented by Jaakkola et al.\cite{Jaakkola96avariational}. In this section, we briefly describe the variational method for approximate inference for Bayesian logistic regression. The description closely follows Jaakola's paper.
+
+Consider a logistic regression model given by 
+\begin{align}
+  P(s|pa, \theta) &= g((2s - 1)\sum_j\theta_jx_j)
+\end{align}
+where $g(x) = (1 + e^{-x})^{-1}$ is the sigmoid function, $s \in \{0, 1\}$ is the binary class label, and $pa = \{x_1, x_2, ... x_n\}$ is the set of variables to classify. The uncertainty of the parameter values is represented by a prior distribution $P(\theta)$.
+
+Instead of finding the most likely $\theta$ to use as in logistic regression, here we do Bayesian inference. The full conditional probability distribution is
+\begin{align}
+P(s|pa) &= \int P(s|pa, \theta)P(\theta)d\theta
+\end{align}
+
+For computing $P(s|pa)$, we need $P(\theta)$ which is computed as the posterior distribution $P(\theta| D^1, D^2, ..., D^T)$, where $D^{(t)} = \{s^{(t)}, x^{(t))}_1, x^{(t))}_2, ..., x^{(t))}_n\}$ is a complete observation. 
+
+It is not feasible to compute this posterior exactly, but it is possible to find a variational transformation of $P(s|pa)$ such that the desired posterior can be computed in closed form. The transformation can be computed from a single observation. Also, under variational approximation the parameter posterior remains Gaussian, and thus the full posterior can be obtained by sequantially absorbing the evidence from each of the observations.
+
+The variational approximation used is given by
+\begin{align}
+  P(s|pa) &= g(X_s) \leq g(\xi)exp\{(X_s - \xi)/2 + \lambda(\xi)(X_s^2 - \xi^2)\}\\
+  &= P(s|pa, \theta, \xi)
+\end{align}
+where $X_s = (2s - 1)\sum_j\theta_jx_j$ and $\lambda(\xi) = [1/2 - g(\xi)]/(2\xi)$.
+
+The posterior $P(\theta|D)$ can be computed by normalizing the left hand side of the following equation.
+\begin{align}
+\label{eq:variational}
+P(s|pa)P(\theta) &\leq P(s|pa, \theta, \xi)P(\theta)
+\end{align}
+
+Since this normalization is not feasible in practice we normalize the variational distribution instead. As the prior distribution is a Gaussian with mean $\mu$ and covariance matrix $\Sigma$, computing the variational posterior - absorbing evidence - amounts to updating the mean and the covariance matrix. 
+
+Omitting the algebra this update yields 
+\begin{align}
+\label{eq:sigma_update}
+\Sigma^{-1}_{post} &= \Sigma^{-1} + 2|\lambda(\xi)|xx^T\\
+\label{eq:mu_update}
+\mu_{post} &= \Sigma_{post}[\Sigma^{-1}\mu + (s - 1/2)x]
+\end{align}
+where $x = [x_1 ...x_n]^T$. 
+
+Now, the posterior covariance matrix depends on the variational parameter $\xi$ through $\lambda(\xi)$ and thus its value needs to be obtained. We obtain $\xi$ by optimizing the approximation in eq. (\ref{eq:variational}). A fast EM algorithm is devised to perform this optimization. This leads to a closed form update for $\xi$ given by 
+\begin{align}
+\label{eq:xi}
+\xi^2 = E\{(\sum_j\theta_jx_j)^2\} &= x^T\Sigma_{post}x + (x^T\mu_{post})^2
+\end{align}
+
+where the expectation is taken with respect to $P(\theta|D, \xi^{old})$, the variational posterior distribution based on the previous vaue of $\xi$. Alternating between eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}) monotonically improves the posterior approximation of eq. (\ref{eq:variational}).
+
+The predictive likelihoods $P(s^t | pa_t, \mathcal{D})$ for any complete observation $D^t$ is given by
+\begin{align}
+  logP(s^t|pa_t, \mathcal{D}) = logg(\xi_t) - \xi_t/2 - \lambda(\xi_t)\xi_t^2 - \frac{1}{2}\mu^T\Sigma^{-1}\mu + \frac{1}{2}\mu^T_t\Sigma^{-1}_t\mu_t + \frac{1}{2}log\frac{|\Sigma_t|}{|\Sigma|}
+\end{align}
+where $\mu$ and $\Sigma$ signify the parameters in $P(\theta)$ and the subscript t refers to the posterior $P(\theta|\mathcal{D}, D^t)$ found by absorbing the evidence in $D^t$.
+
+We implemented this algorithm, mainly the updating rules in eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The code does not yet converge. Since the algorithm involves several covariance matrix inversions, when the dataset contains large number of features, the algorithm runs very slowly right now.

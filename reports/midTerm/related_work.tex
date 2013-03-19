@@ -1,0 +1,23 @@
+\section{Related Works}
+
+Asuncion {\it et. al.}~\cite{Asuncion2009smoothing} compare several
+approximate algorithms for Latent Dirichlet Allocation (LDA), including
+variants of variational Bayes, ML estimation, maximum a posterior (MAP), and
+collapsed Gibbs sampling. They report that LDA is more sensitive to the
+hyperparameters than the approximation algorithms. However, finding optimal
+hyperparameters are generally expensive, and they showed that iterative method
+(e.g.~\cite{Minka00}) is not always optimal. Due to the nature of LDA, the
+study does not yield performance comparison of classification task. Jiang {\it
+et. al.}~\cite{medlda_MCMC12} report that sampling-based approximations
+significant out-perform variational methods on classification tasks using
+max-entropy discrimination LDA (MedLDA), a supervised variant of LDA.
+Both~\cite{Asuncion2009smoothing, medlda_MCMC12} use only text corpus, while
+our study include text, ads behavior, genomics data, acceleration data, among
+others (sec.~\ref{sec:experiments}). 
+
+Mukherjee {\it et. al.}~\cite{Mukherjee08} provide a theoretical comparison of
+two variational Bayes methods for LDA based on mean-field approximation. Here
+we consider Bayesian logistic regression which does not lend to mean field
+factorization and thus require potentially more challenging variational
+methods. 
+
