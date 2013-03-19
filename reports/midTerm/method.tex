@@ -12,6 +12,89 @@ approximation schemes (Laplace approximation, variational methods, and Gibbs
 sampling), and point estimations (MLE, MAP) together with the associated
 prediction rules.
 
+\subsection{Markov Chain Monte Carlo approximation}
+\label{sec:MCMCmethod}
+Let us first discuss the simple bayesian binary probit regression model and 
+then we will ease into bayesian logistic regression. We follow the lead of
+the work done by Holmes et al.~\cite{Holmes}. Let $\psi$ denotes the gaussian
+cdf, binary probit regression's likelihood is:
+\begin{equation}
+\pi(y_i=1|x_i) = \psi(x_i^Tw)
+\end{equation}
+
+We define a set of n auxiliary variables $z_i$ as there is no cojugate prior to
+the gaussian cdf as:
+\begin{equation}
+z_i=x_i^Tw+\epsilon_i
+\end{equation}
+
+and $\epsilon_i \sim N(0,1)$, and if $z_i>0$ then $y_i=1$ and vice-versa.
+Removing w from likelihood in this new model makes the model more amenable
+to sampling. For this
+specific case of  Normal prior over w, this model has a simple
+Gibbs sampling updates where $z_i$ is drawn from independent 
+truncated Normal distributions, and w is drwn from a multvariate Normal
+distribution. Formally, a easy-to-follow Gibbs sampling scheme with
+$\pi(w)\sim N(b,v)$ can be obtained using the following:
+\begin{eqnarray}
+z_i|w \propto N(x_i^Tw,1)I(z_i>0)y_i=1 \\
+z_i|w \propto N(x_i^Tw,1)I(z_i\leq 0)y_i\neq 0 \\
+w|z,y \sim N(B,V) \\
+B = V(v^{-1}b+X^Tz) \\
+V=(v^{-1}+X^TX)^-1 \\
+\end{eqnarray}
+
+This simple Gibbs sampling strategy is poor in performance because the
+components of w are strongly correlated with the components of z. To remove this
+we sample w and z together through the use of the product rule:
+\begin{equation}
+\pi(w,z|y) = \pi(z|y)*\pi(w|z)
+\end{equation}
+
+This method draws every $z_i$ from a Normal distribution that has means
+and variances obtained using a leave-one-out marginal predictive density,
+and these conditional means are updated after each draw of $z_i$.
+Later we sample w from its conditional gaussian after all of the
+$z_i$ have been drawn. 
+
+\subsubsection{Binary Logistic Regression}
+Starting from the binary Bayesian probit regression model explained before , we
+propose to obtain updates for binary Bayesian logistic regression by
+substituting the independent Normal 
+prior over $\epsilon$ with independent logistic. 
+This significantly alters the simple sampling scheme we described earlier. To
+obtain a simple sampling strategy of the new model we define an addtional group
+of auxiliary variables $λ_{1:n}$ along side modifying the noise function to get
+a scale mixture of gaussians with marginal densities as logistic distribution,
+(here KS is the Kolmogorov-Smirnov distribution):
+\begin{eqnarray}
+\epsilon_i \sim N(0,\lambda_i) \\
+\lambda_i = (2\nu_i)^2 \\
+\nu_i \sim KS \\
+\end{eqnarray}
+
+If one takes $\lambda$ to be  constant, then this is identical to the
+Probit model above. Though each value of $z_i$ contains an individual term i for
+its noise variance now. Moreover, the greatest advantage is that we know the way
+to draw samples from this model given fixed $\lambda$ . We just have to use
+weighted least squares rather than least squares (and teh related inverse of the 
+hessian matrix), and then just draw from individual truncated gaussain of
+different variance parameters. After this, we are in a poition to write a
+Gibbs sampler given that we will be able to sample from the KS distribution.
+\cite{Holmes} provides rejection sampling technique to draw samples 
+from the KS distribution via the Generalized Inverse Gaussian distibution as the
+sampling density. Using this, we write a simple Gibbs sampler for this
+logistic regression setting as follows:
+
+\begin{eqnarray}
+z_i|w,\lambda \propto N(x_i^Tw,\lambda_i)I(z_i>0)~if~y_i=1 \\
+z_i|w,\lambda \propto N(x_i^Tw,\lambda_i)I(z_i\leq 0)~if~y_i\neq 0 \\
+w|z,y.\lambda \sim N(B,V) \\
+B = V(v^{-1}b+X^TWz) \\
+V=(v^{-1}+X^TWX)^{-1} \\
+W=diag(\lambda^{-1}) \\
+\end{eqnarray}
+
 \subsection{Laplace Approximation and associated MAP}
 
 Laplace approximation approximate the posterior $p(\bm{w}|\bm{t})$ with a
