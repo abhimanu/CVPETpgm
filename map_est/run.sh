@@ -19,11 +19,11 @@
 #--save_binary=false
 
 # small test set
-time ./map_est --trainfile="../dataset/human_class5_train.csv" \
---testfile="../dataset/human_class5_test.csv" \
---labelC1=5 --s0=0.05
+#time ./main_binary --trainfile="../dataset/human_class5_train.csv" \
+#--testfile="../dataset/human_class5_test.csv" \
+#--labelC1=5 --s0=0.05 --algo="delta"
 
-#time ./map_est --trainfile="../dataset/human_class5_train_small.dat" \
-#--testfile="../dataset/human_class5_test_small.dat" \
-#--labelC1=0 \
-#--s0=0.05 --d=54877 --Ntrain=500 --Ntest=200
+# yeast
+time ./main_yeast --trainfile="../dataset/yeast-train.csv" \
+--testfile="../dataset/yeast-test.csv" \
+--labelC1=5 --s0=0.05 --max_iter=500 --algo="delta"
