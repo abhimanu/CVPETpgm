@@ -132,15 +132,9 @@ void read_data_yeast(string &filename, fmat &X, imat &Y, int *d_aug) {
 
   X.resize(N, *d_aug);
   X.ones();
-  //cout << "X.n_cols = " << X.n_cols << endl;
-  //cout << "d-n_cols_class = "  << d-ncols_class << endl;
-  cout << "cp1 " << endl;
   X.cols(1, d) = m.cols(0, m.n_cols - ncols_class - 1);  // first row of X is 1's.
-  cout << "cp2 " << endl;
-
   Y = conv_to<imat>::from(m.cols(m.n_cols - ncols_class, m.n_cols-1));
 
-  cout << "cp3 " << endl;
   final = clock() - init;
   int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
 

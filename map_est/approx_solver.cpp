@@ -39,13 +39,14 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
 
     update_w -= lambda * w;
     update_w *= eta;
-    change_w = as_scalar(sum(pow(update_w,2)));
+    //change_w = as_scalar(sum(pow(update_w,2)));
+    change_w = as_scalar(update_w.max());
     w += update_w;
   }
 
   if (i == max_iter) {
     cerr << "Gradient descent failed to converge." << endl;
-    exit(1);
+    //exit(1);
   }
 
   final = clock() - init;
@@ -72,7 +73,7 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
   int d = X.n_cols;
   int N = X.n_rows;
 
-  double eta = 0.0001;  // learning rate
+  double eta = 0.005;  // learning rate, was 0.0001
   double thresholdSq = 0.001 * 0.001; // (convergence threshold)^2
 
   // initialize wmap uniform random on [-1,1]
@@ -87,6 +88,7 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
     if (i % 10 == 0) {
       cout << "grad desc: iteration " << i << 
       " ||w||^2_2 = " << as_scalar(sum(w.t() * w)) << endl;
+      cout << "change_w = " << change_w << endl; 
     }
 
     fcolvec update_w(d);
@@ -135,13 +137,14 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
 
     //update_w -= lambda * w;
     update_w *= eta;
-    change_w = as_scalar(sum(pow(update_w,2)));
+    //change_w = as_scalar(sum(pow(update_w,2)));
+    change_w = as_scalar(update_w.max());
     w += update_w;
   }
 
   if (i == max_iter) {
     cerr << "Gradient descent failed to converge." << endl;
-    exit(1);
+    //exit(1);
   }
 
   final = clock() - init;
