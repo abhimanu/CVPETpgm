@@ -186,3 +186,5 @@ The predictive likelihoods $P(s^t | pa_t, \mathcal{D})$ for any complete observa
 where $\mu$ and $\Sigma$ signify the parameters in $P(\theta)$ and the subscript t refers to the posterior $P(\theta|\mathcal{D}, D^t)$ found by absorbing the evidence in $D^t$.
 
 We implemented this algorithm, mainly the updating rules in eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The code does not yet converge. Since the algorithm involves several covariance matrix inversions, when the dataset contains large number of features, the algorithm runs very slowly right now.
+
+\input{delta_method}
