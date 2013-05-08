@@ -129,62 +129,48 @@ The predictive distribution for Laplace-approximated posterior is not close
 form, but by approximating the logistic sigmoid function with probit function,
 we recover $\bm{w}_{MAP}$ as the decision boundary.
 
-\subsection{The Variational Approach}
+\subsection{The Variational Approach by Jaakkola and Jordan}
 We study a variational method presented by Jaakkola et al.\cite{Jaakkola96avariational}. In this section, we briefly describe the variational method for approximate inference for Bayesian logistic regression. The description closely follows Jaakola's paper.
 
-Consider a logistic regression model given by 
+Since it is infeasible to compute the posterior $p(\bm{w} | \bm{t}, \bm{\phi})$ exactly, this method approximates the sigmoid function with its variational form, as given below.
+
 \begin{align}
-  P(s|pa, \theta) &= g((2s - 1)\sum_j\theta_jx_j)
+  p(t | \bm{w}, \phi) &= \sigma(\Phi_s) \leq \sigma(\xi) exp\{(Phi_s - \xi)/2 + \lambda(\xi)(\Phi_s^2 - \xi^2)\} \\
+  &= P(t | \bm{w}, \phi, \xi)
 \end{align}
-where $g(x) = (1 + e^{-x})^{-1}$ is the sigmoid function, $s \in \{0, 1\}$ is the binary class label, and $pa = \{x_1, x_2, ... x_n\}$ is the set of variables to classify. The uncertainty of the parameter values is represented by a prior distribution $P(\theta)$.
+where $\Phi_s = (2t - 1)\sum_jw_j\phi_j$ and $\lambda(\xi) = [1/2 - \sigma(\xi)]/(2\xi)$.
 
-Instead of finding the most likely $\theta$ to use as in logistic regression, here we do Bayesian inference. The full conditional probability distribution is
-\begin{align}
-P(s|pa) &= \int P(s|pa, \theta)P(\theta)d\theta
-\end{align}
-
-For computing $P(s|pa)$, we need $P(\theta)$ which is computed as the posterior distribution $P(\theta| D^1, D^2, ..., D^T)$, where $D^{(t)} = \{s^{(t)}, x^{(t))}_1, x^{(t))}_2, ..., x^{(t))}_n\}$ is a complete observation. 
-
-It is not feasible to compute this posterior exactly, but it is possible to find a variational transformation of $P(s|pa)$ such that the desired posterior can be computed in closed form. The transformation can be computed from a single observation. Also, under variational approximation the parameter posterior remains Gaussian, and thus the full posterior can be obtained by sequantially absorbing the evidence from each of the observations.
-
-The variational approximation used is given by
-\begin{align}
-  P(s|pa) &= g(X_s) \leq g(\xi)exp\{(X_s - \xi)/2 + \lambda(\xi)(X_s^2 - \xi^2)\}\\
-  &= P(s|pa, \theta, \xi)
-\end{align}
-where $X_s = (2s - 1)\sum_j\theta_jx_j$ and $\lambda(\xi) = [1/2 - g(\xi)]/(2\xi)$.
-
-The posterior $P(\theta|D)$ can be computed by normalizing the left hand side of the following equation.
+The posterior $P(\bm{w}|\bm{t}, \bm{\phi})$ can be computed by normalizing the left hand side of the following equation.
 \begin{align}
 \label{eq:variational}
-P(s|pa)P(\theta) &\leq P(s|pa, \theta, \xi)P(\theta)
+p(\bm{t}|\bm{\phi})p(\bm{w}) &\leq P(\bm{t}|\bm{\phi}, \bm{w}, \xi)P(\bm{w})
 \end{align}
 
-Since this normalization is not feasible in practice we normalize the variational distribution instead. As the prior distribution is a Gaussian with mean $\mu$ and covariance matrix $\Sigma$, computing the variational posterior - absorbing evidence - amounts to updating the mean and the covariance matrix. 
+Since this normalization is not feasible in practice we normalize the variational distribution instead. As the prior distribution is a Gaussian, we assume it has mean $\mu$ and covariance matrix $\Sigma$. To compute the variational posterior, first, we absorb the observations to update $\mu$ and $\Sigma$.
 
-Omitting the algebra this update yields 
+For each observation, $Sigma$ and $\mu$ are updated as below: 
 \begin{align}
 \label{eq:sigma_update}
-\Sigma^{-1}_{post} &= \Sigma^{-1} + 2|\lambda(\xi)|xx^T\\
+\Sigma^{-1}_{post} &= \Sigma^{-1} + 2|\lambda(\xi)|\phi\phi^T\\
 \label{eq:mu_update}
-\mu_{post} &= \Sigma_{post}[\Sigma^{-1}\mu + (s - 1/2)x]
+\mu_{post} &= \Sigma_{post}[\Sigma^{-1}\mu + (t - 1/2)\phi]
 \end{align}
-where $x = [x_1 ...x_n]^T$. 
+where $\phi = [\phi_1 ...\phi_n]^T$. 
 
-Now, the posterior covariance matrix depends on the variational parameter $\xi$ through $\lambda(\xi)$ and thus its value needs to be obtained. We obtain $\xi$ by optimizing the approximation in eq. (\ref{eq:variational}). A fast EM algorithm is devised to perform this optimization. This leads to a closed form update for $\xi$ given by 
+Now, the posterior covariance matrix depends on the variational parameter $\xi$ through $\lambda(\xi)$ and thus its value needs to be obtained. We obtain $\xi$ by optimizing the approximation in eq. (\ref{eq:variational}). A fast EM algorithm is devised to perform this optimization. This leads to a closed form update for $\xi$. For each observation, the update equation is given by 
 \begin{align}
 \label{eq:xi}
-\xi^2 = E\{(\sum_j\theta_jx_j)^2\} &= x^T\Sigma_{post}x + (x^T\mu_{post})^2
+\xi^2 = E\{(\sum_jw_j\phi_j)^2\} &= \phi^T\Sigma_{post}\phi + (\phi^T\mu_{post})^2
 \end{align}
 
-where the expectation is taken with respect to $P(\theta|D, \xi^{old})$, the variational posterior distribution based on the previous vaue of $\xi$. Alternating between eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}) monotonically improves the posterior approximation of eq. (\ref{eq:variational}).
+where the expectation is taken with respect to $P(\bm{w}|\bm{\phi}, \xi^{old})$, the variational posterior distribution based on the previous vaue of $\xi$. Alternating between eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}) monotonically improves the posterior approximation of eq. (\ref{eq:variational}).
 
-The predictive likelihoods $P(s^t | pa_t, \mathcal{D})$ for any complete observation $D^t$ is given by
+Let $\mathcal{D}$ be the set of all observations. The predictive likelihoods $P(t^p | w_p, \mathcal{D})$ for any complete observation $D^t$ is given by
 \begin{align}
-  logP(s^t|pa_t, \mathcal{D}) = logg(\xi_t) - \xi_t/2 - \lambda(\xi_t)\xi_t^2 - \frac{1}{2}\mu^T\Sigma^{-1}\mu + \frac{1}{2}\mu^T_t\Sigma^{-1}_t\mu_t + \frac{1}{2}log\frac{|\Sigma_t|}{|\Sigma|}
+  logP(t^p|w_p, \mathcal{D}) = log(\xi_p) - \xi_p/2 - \lambda(\xi_p)\xi_p^2 - \frac{1}{2}\mu^T\Sigma^{-1}\mu + \frac{1}{2}\mu^T_t\Sigma^{-1}_t\mu_t + \frac{1}{2}log\frac{|\Sigma_t|}{|\Sigma|}
 \end{align}
-where $\mu$ and $\Sigma$ signify the parameters in $P(\theta)$ and the subscript t refers to the posterior $P(\theta|\mathcal{D}, D^t)$ found by absorbing the evidence in $D^t$.
+where $\mu$ and $\Sigma$ signify the parameters in $P(\bm{w})$ and the subscript $p$ refers to the posterior $P(\bm{w}|\mathcal{D}, D^p)$ found by absorbing the evidence in $D^p$.
 
-We implemented this algorithm, mainly the updating rules in eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The code does not yet converge. Since the algorithm involves several covariance matrix inversions, when the dataset contains large number of features, the algorithm runs very slowly right now.
+We implemented this algorithm, mainly the updating rules in eq. (\ref{eq:sigma_update}), eq. (\ref{eq:mu_update}) and eq. (\ref{eq:xi}). The main advantage of this algorithm is that it usually converges in only 2 to 3 iterations. Although the computation involves expensive matrix inversion, matrix inversion here can be computed as solving a linear system. Therefore, this approach is still pretty fast.
 
 \input{delta_method}
