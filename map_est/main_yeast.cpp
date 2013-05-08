@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <cassert>
+#include <fstream>
+#include <iterator>
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -69,26 +71,35 @@ int main(int argc, char** argv) {
   int n_class = 14;
   vector<double> train_accuracies(n_class);
   vector<double> test_accuracies(n_class);
+  vector<double> runtimes(n_class);
   double train_accuracy_total = 0;
   double test_accuracy_total = 0;
 
+
+  fmat w_all(d_aug, n_class);
   for (int iclass = 0; iclass < n_class; iclass++) {
     fcolvec w(d_aug);
+    int runtime;
     if (algo == "laplace") {
-      wmap_grad_desc(Xtrain, Ytrain.col(iclass), w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter);
+      wmap_grad_desc(Xtrain, Ytrain.col(iclass), w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter, &runtime);
     }
     else if (algo == "delta") {
-      delta_variational(Xtrain, Ytrain.col(iclass), w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter);
+      delta_variational(Xtrain, Ytrain.col(iclass), w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter, &runtime);
     }
     cout << "||w||^2 = " << as_scalar(sum(w.t() * w)) << endl;
 
     double train_accuracy = classification_accuracy(Xtrain, Ytrain.col(iclass), w);
     double test_accuracy = classification_accuracy(Xtest, Ytest.col(iclass), w);
+    
+    // store the result
     train_accuracies[iclass] = train_accuracy;
     test_accuracies[iclass] = test_accuracy;
+    runtimes[iclass] = runtime;
 
     train_accuracy_total += train_accuracy;
     test_accuracy_total += test_accuracy;
+
+    w_all.col(iclass) = w;
 
     cout << "train accuracy (class " << iclass << ") = " 
       << train_accuracy << endl;
@@ -104,6 +115,25 @@ int main(int argc, char** argv) {
     Xtest.save(FLAGS_testfile + ".X.arm");
     Ytest.save(FLAGS_testfile + ".Y.arm");
   }
+
+  // write to file
+  w_all.save("w_yeast_" + algo + ".arm");
+
+  // train_accuracies
+  string train_acc_filename = "./yeast_train_acc_" + algo +".dat";
+  std::ofstream output_file(train_acc_filename.c_str());
+  std::ostream_iterator<double> output_iterator(output_file, "\n");
+  std::copy(train_accuracies.begin(), train_accuracies.end(), output_iterator);
+
+  string test_acc_filename = "./yeast_test_acc_" + algo +".dat";
+  std::ofstream output_file2(test_acc_filename.c_str());
+  std::ostream_iterator<double> output_iterator2(output_file2, "\n");
+  std::copy(test_accuracies.begin(), test_accuracies.end(), output_iterator2);
+  
+  string runtime_filename = "./yeast_runtime_" + algo +".dat";
+  std::ofstream output_file3(runtime_filename.c_str());
+  std::ostream_iterator<double> output_iterator3(output_file3, "\n");
+  std::copy(runtimes.begin(), runtimes.end(), output_iterator3);
 
   return 0;
 }

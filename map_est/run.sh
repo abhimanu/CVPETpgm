@@ -24,6 +24,15 @@
 #--labelC1=5 --s0=0.05 --algo="delta"
 
 # yeast
-time ./main_yeast --trainfile="../dataset/yeast-train.csv" \
---testfile="../dataset/yeast-test.csv" \
---labelC1=5 --s0=0.05 --max_iter=500 --algo="delta"
+#time ./main_yeast --trainfile="../dataset/yeast-train.csv" \
+#--testfile="../dataset/yeast-test.csv" \
+#--s0=1 --max_iter=500 --algo="laplace"
+
+
+time ./main_binary --trainfile="../dataset/spambase_train.csv" \
+--testfile="../dataset/spambase_test.csv" \
+--labelC1=1 --s0=1 --labelC1=1 --algo="delta" --max_iter=1000
+
+#time ./main_binary --trainfile="../dataset/statlog.heart_train.csv" \
+#--testfile="../dataset/statlog.heart_test.csv" \
+#--labelC1=2 --s0=1 --labelC1=2 --algo="delta" --max_iter=10000

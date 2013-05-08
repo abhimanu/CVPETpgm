@@ -5,7 +5,7 @@ LIBS = -larmadillo -lgflags
 HPPFILES = util.hpp approx_solver.hpp
 CPPFILES = util.cpp approx_solver.cpp
 
-all: main_binary main_yeast
+all: main_binary 
 
 #compress_data: compress_data.cpp
 #	$(CPP) $^ -o $@ $(FLAGS)	

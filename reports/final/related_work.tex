@@ -1,0 +1,49 @@
+\section{Related Works}
+
+Asuncion {\it et. al.}~\cite{Asuncion2009smoothing} compare several
+approximation algorithms for Latent Dirichlet Allocation (LDA), including
+variants of variational Bayes, ML estimation, maximum a posterior (MAP), and
+collapsed Gibbs sampling. They report that LDA is more sensitive to the
+hyperparameters than the approximation algorithms. However, finding optimal
+hyperparameters are generally expensive, and they showed that iterative method
+(e.g.~\cite{Minka00}) is not always optimal. Due to the nature of LDA, the
+study does not yield performance comparison of classification task. Jiang {\it
+et. al.}~\cite{medlda_MCMC12} report that sampling-based approximations
+significant out-perform variational methods on classification tasks using
+max-entropy discrimination LDA (MedLDA), a supervised variant of LDA.
+Both~\cite{Asuncion2009smoothing, medlda_MCMC12} use only text corpus, while
+our study include text, ads behavior, genomics data, acceleration data, among
+others (sec.~\ref{sec:experiments}). 
+
+Mukherjee {\it et. al.}~\cite{Mukherjee08} provide a theoretical comparison of
+two variational Bayes methods for LDA based on mean-field approximation. Here
+we consider Bayesian logistic regression which does not lend to mean field
+factorization and thus require potentially more challenging variational
+methods. Another comparative study over LDA model is by Wallach et
+al.~\cite{WallachMM09} where they study different priors and the
+corressponding MAP estimates for LDA. Though they mostly concern with LDA and
+priors they do enrich the literature with their valuable analysis and provide
+some insights regarding the choice of priors and sampling techniques. 
+
+Holmes et. al~\cite{Holmes} study MCMC estimation techniques over Bayesian logistic
+regression in great detail. They build up the bayesian framework for logistic
+regression from logit function to all the way upto Kolmogorov-Smirnov prior over
+the regression parameter. Since the resultant posterior does not have a nice
+closed form, they provide rejection based sampling over set of truncated
+normals for the parameter updates. The experiments are performed over resonably
+diverse datasets, though the only problem is the low dimension of their
+datastes. All of their datasets have dimension less than ten which is way
+smaller than a real world dataset. We in our experiments have tried to maintain
+a diverse set of datasets which deal in very high deimension space. The
+compartive analysis changes in the higher dimension since the sampling
+strategies tend to be slower and less accurate as one increases the dimension of
+the data. 
+
+As one can see there has not been any substantial works done in the area of
+statistics or machine learning for a comparaitive study of various approximate
+estimation techniques inclding sampling, variational and Laplace techniques, for
+graphical models. Besides we also perform a comparitive study of these
+techniques over two distinct graph objectives: 1) MLE, and 2)MAP. It
+would be a worthwhile effort which has a potential to provide working insights
+into the world of these complex estimation techniques.
+

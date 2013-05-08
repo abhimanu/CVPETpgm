@@ -28,7 +28,7 @@ void read_data(string &filename, fmat &X, icolvec &Y, int *d_aug, int label_c1) 
   X.cols(1, d) = m.cols(0, d-1);  // first row of X is 1's.
 
   Y.resize(N);
-  Y = conv_to<icolvec>::from(m.col(d-1));
+  Y = conv_to<icolvec>::from(m.col(m.n_cols - 1));
   for (int n = 0; n < N; n++) {
     if (Y(n) == label_c1) Y(n) = 1;
     else Y(n) = 0;
@@ -40,9 +40,13 @@ void read_data(string &filename, fmat &X, icolvec &Y, int *d_aug, int label_c1) 
   cout << "***** Done reading " << filename << ". N = " << N 
     << ", d = " << d << ". Total time = " 
     << time_elapsed << " seconds. *****" << endl;
+  cout << "class split: Y(i) = 1 : " << double(as_scalar(sum(Y)))/double(Y.n_rows) << endl;
+  cout << "class 1: " << double(as_scalar(sum(Y))) << endl;
+  cout << "n_data = " << double(Y.n_rows) << endl;
 
   cout << "X(0, 0...9) = " << X(0, span(0, 9)) << endl << endl;
   cout << "Y(0) = " << Y(0) << endl; 
+
 }
 
 /**

@@ -1,10 +1,11 @@
 #include "approx_solver.hpp"
 #include <vector>
+#include <math.h>
 using std::vector;
 double sigmoid(const fcolvec& w, const fcolvec& x);
 
 void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w, 
-    double s0, int n_init, int max_iter) {
+    double s0, int n_init, int max_iter, int *runtime, const fmat &Xtest, const icolvec &Ytest) {
 
   clock_t init, final;  // record the training time.
   init = clock();
@@ -12,8 +13,8 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
   int d = X.n_cols;
   int N = X.n_rows;
 
-  double eta = 0.0001;  // learning rate
-  double thresholdSq = 0.001 * 0.001; // (convergence threshold)^2
+  double eta = 0.003;  // learning rate
+  double thresholdSq = 0.003; // 
 
   // initialize wmap uniform random on [-1,1]
   w.randu(); // uniform random on [0,1]
@@ -23,9 +24,12 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
 
   int i;
   for(i = 0; change_w > thresholdSq && i < max_iter; i++) {
-    if (i % 10 == 0) {
+    if (i % 1000 == 0) {
       cout << "grad desc: iteration " << i << 
       " ||w||^2_2 = " << as_scalar(sum(w.t() * w)) << endl;
+      cout << "change_w = " << change_w << endl; 
+      double accuracy = classification_accuracy(Xtest, Ytest, w);
+      cout << "accuracy = " << accuracy << endl;
     }
 
     fcolvec update_w(d);
@@ -38,9 +42,11 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
     }
 
     update_w -= lambda * w;
-    update_w *= eta;
+    //update_w *= eta;
+    update_w *= eta * pow(200 + i, -0.5);
     //change_w = as_scalar(sum(pow(update_w,2)));
-    change_w = as_scalar(update_w.max());
+    fcolvec update_w_abs = abs(update_w);
+    change_w = as_scalar(update_w_abs.max());
     w += update_w;
   }
 
@@ -51,6 +57,7 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
 
   final = clock() - init;
   int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
+  *runtime = time_elapsed;
   double time_per_iter = (double) time_elapsed / i;
   cout << "Gradient descent converged in " << i << " steps, totaling " 
     <<  time_elapsed << " seconds (" << time_per_iter << " seconds/iter." 
@@ -65,7 +72,7 @@ void wmap_grad_desc(const fmat &X, const icolvec& Y, fcolvec& w,
  *  Delta Method
  */
 void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w, 
-    double s0, int n_init, int max_iter) {
+    double s0, int n_init, int max_iter, int *runtime, const fmat &Xtest, const icolvec &Ytest) {
 
   clock_t init, final;  // record the training time.
   init = clock();
@@ -74,7 +81,11 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
   int N = X.n_rows;
 
   double eta = 0.005;  // learning rate, was 0.0001
-  double thresholdSq = 0.001 * 0.001; // (convergence threshold)^2
+  //double eta = 1./2./d/2.;  // learning rate, was 0.0001
+  cout << "initial eta = " << eta << endl;
+  //double thresholdSq = 0.001 * 0.001; // (convergence threshold)^2
+  //double threshold = 0.003; // used for yeast
+  double threshold = 0.0001; // spambase 
 
   // initialize wmap uniform random on [-1,1]
   w.randu(); // uniform random on [0,1]
@@ -84,11 +95,13 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
   double change_w = 9999.;  // ||w_new - w_old||^2, initialized to large number
 
   int i;
-  for(i = 0; change_w > thresholdSq && i < max_iter; i++) {
+  for(i = 0; change_w > threshold && i < max_iter; i++) {
     if (i % 10 == 0) {
       cout << "grad desc: iteration " << i << 
       " ||w||^2_2 = " << as_scalar(sum(w.t() * w)) << endl;
       cout << "change_w = " << change_w << endl; 
+      double accuracy = classification_accuracy(Xtest, Ytest, w);
+      cout << "accuracy = " << accuracy << endl;
     }
 
     fcolvec update_w(d);
@@ -136,9 +149,11 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
     //cout << "update_w computation takes " << time_elapsed<< endl;
 
     //update_w -= lambda * w;
-    update_w *= eta;
-    //change_w = as_scalar(sum(pow(update_w,2)));
-    change_w = as_scalar(update_w.max());
+    double t0 = 200;
+    update_w *= eta * pow(200 + i, -0.5);
+    fcolvec update_w_abs = abs(update_w);
+    change_w = as_scalar(update_w_abs.max());
+    if (i == 0) cout << "iter 0: change_w = " << change_w << endl;
     w += update_w;
   }
 
@@ -149,6 +164,7 @@ void delta_variational(const fmat &X, const icolvec& Y, fcolvec& w,
 
   final = clock() - init;
   int time_elapsed = (double)final / ((double)CLOCKS_PER_SEC);
+  *runtime = time_elapsed;
   double time_per_iter = (double) time_elapsed / i;
   cout << "Gradient descent (Delta method) converged in " << i << " steps, totaling " 
     <<  time_elapsed << " seconds (" << time_per_iter << " seconds/iter." 

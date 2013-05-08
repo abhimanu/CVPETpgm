@@ -65,11 +65,12 @@ int main(int argc, char** argv) {
   }
 
   fcolvec w(d_aug);
+  int runtime;
   if (algo == "laplace") {
-    wmap_grad_desc(Xtrain, Ytrain, w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter);
+    wmap_grad_desc(Xtrain, Ytrain, w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter, &runtime, Xtest, Ytest);
   }
   else if (algo == "delta") {
-    delta_variational(Xtrain, Ytrain, w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter);
+    delta_variational(Xtrain, Ytrain, w, FLAGS_s0, FLAGS_n_init, FLAGS_max_iter, &runtime, Xtest, Ytest);
   }
   cout << "||w||^2 = " << as_scalar(sum(w.t() * w)) << endl;
 
