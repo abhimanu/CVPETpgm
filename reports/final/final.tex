@@ -47,22 +47,23 @@ Pittsburgh, PA 15213\\
 
 \begin{abstract}
 
-We present a comparative study of various approximation algorithms present in
-the literature for probabilistic graphical model inference and estimation. There
-is a dilemma in a considerable number of research populace regarding the choice
-of the estimation algorithm for graphical models. There is no hard and
-fast rule as to when to use what. We attempt to present here an empirical study of
-various approximation algorithms, especially the big two: sampling
-and variational based, at present prevalent in graphical model learning
-literature.
-Though our model for learning is restricted to Bayesian logistic regression it does present a
-considerable challege since there is non-conjugacy due to presence of sigmoid
-function for the label prediction. It also presents generalizable enough
-conclusions regarding the state of affairs in chosing one algorithm over
-the other. We present clever ways to work-around the non-cnjugacy in variational as
-well as sampling methods. We analyze the algorithms on a diverse set 
-of datasets. We present run time results for speed comparison among the
-different approximation techniques. 
+With the recent development of analytically intractable graphical models, many
+approximation inference algorithms such as variational inferences and sampling
+techniques have also emerged. Despite a large body of studies on these
+approximate methods, there is currently no clear comparison of their relative
+performances on various models and datasets.  Here we present an empirical
+study of Bayesian logistic regression using three variational methods and one
+sampling algorithm.  With Guassian prior, Bayesian logistic regression is an
+analytically intractable model and presents considerable challeges due to the
+non-conjugacy between the Guassian prior and the sigmoid likelihood function.
+We present clever techniques to handle the non-cnjugacy in variational as well
+as sampling methods. We analyze the algorithms on three diverse datasets and
+present run time results for speed comparison among the different
+approximation techniques. Our results give convincing evidences that sampling
+based method outperforms variational inferences but requires longer runtime
+compared with variational inferences.  We hypothesize this difference between
+variational inference and sampling method to be generalizable to other models
+and datasets.
 
 \end{abstract}
 
