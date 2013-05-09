@@ -21,21 +21,38 @@ step-size selection problem. tuning this step size seems specially important in
 this case since there are many more parameters in case of graphical models than
 anyother typical optimization objective. The slow speed as well poor
 converegence of delta method is a peculiar observation. We believe that delta is
-highly prone to tuning various parameters and initial points and thus behaves
-poorly. 
+highly prone to tuning of its various parameters as well as initial points and
+thus behaves poorly. Though Laplace approaximation is a special case of delta it
+performs considerable better than the delta. 
 
 The three algorithms used in this paper almost surely cover the
-span of various styles of approximation algorithms used in all graphical model
-estimations. There are other approximation algorithms such as loopy belief
-propagation for general graphs but these are variants of the variational mehods
-covered in this work~\cite{Heskes02}. We covered broad 
+span of various styles of approximations used in the graphical model
+estimations. There are other approaches besides these such as
+loopy belief propagation for general graphs but these are variants of the 
+variational methods covered here~\cite{Heskes02}. We used a non-trivial
+estimation problem involving a non-conjguate distribution set and by clever
+approximation either via gaussians or Kolmogorov Smirnov obtained reliable and
+accurate approximation techniques based on the approaches present in the
+literature.
 
-Sampling performs
-comparatively better than the other approximate inference schemes on all datasets
+As we know sampling based techniques perform not so well in high dimensions. A
+future extension of the work would be to evaluation sampling techniques on high
+dimensional models. This can be achieved either by increasing the feature space
+in the current Bayesian logistic regresison problem or a different high
+dimensional model altogether such as consitional random fields~\cite{sutton06introduction} 
+or some
+other model with complex structured feature space with high dimensions. Since
+variational based methods generaly perform well in higher dimension there is a
+a likelihood that they might beat sampling not just in speed but accuracy too. 
+Another interestin dimension to explore would be a comparison between
+distributed version of these approximation techniques. Since the biggest
+drawback of sampling based methods is there slow speed of converegence, a
+distributed sampling strategy might be fatser as well accurate and thus a better
+alternative to other techniques. 
 
-    But sampling has many parameters to be tuned
-
-    Variational schemes are sensitive to step size of the ascent while optimizing
-
-    MCMC based sampling is slower than most variational inference (except delta method).
-    But can be fast when there is good mixing in the chains.
+%     But sampling has many parameters to be tuned
+% 
+%     Variational schemes are sensitive to step size of the ascent while optimizing
+% 
+%     MCMC based sampling is slower than most variational inference (except delta method).
+%     But can be fast when there is good mixing in the chains.
