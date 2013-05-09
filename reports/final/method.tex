@@ -112,7 +112,7 @@ W=diag(\lambda^{-1}) \\
 We use block Gibbs sampling here. 
 There are two approaches to performing block sampling of the parameters above.
 In the first approach we sample $z$ and $w$ simultaneously and the parameter
-$\lambda$ is sampled after that. In the second approachIn the second approach 
+$\lambda$ is sampled after that. In the second approach 
 the block sampling updates $z$ and
 $\lambda$ first and $z$ later. This way the $z_i|w,\lambda$ follows a
 truncated logistic centered at $x_i^Tw$. This avoids the need to compute
@@ -132,7 +132,7 @@ P(U<\frac{exp(x_i^Tw)}{1+exp(x_i^Tw)})
 \label{eqn:uniformSample}
 \end{equation}
 
-Here we have clevelry introduced an auxiliary variable $U$.
+Here we have cleverly introduced an auxiliary variable $U$.
 Now a gibbs sampler can easly be derived which alternates between $w$ and $u$.
 Though it sounds enticing the sampler obtained using this technique is high
 degree of auto-correlation between $w$ and $u$ and converges very poorly in all
@@ -146,13 +146,53 @@ concentrate only on Kolmogorov Smirnov based sampling in the later sections.
 \centering
 \includegraphics[height=10.0cm]{results/uniformSampleChain.png}
 
-\caption{A typical Markov chain for uniform distribution based sampler }
+\caption{A typical Markov chain for uniform distribution based sampler on the
+Spambase dataset}
 
 \label{fig:uniformSamplerChain}
 \end{figure}
 
 
+<<<<<<< HEAD
 \input{method_laplace}
+=======
+\subsection{Laplace Approximation and associated MAP}
+
+Laplace approximation approximates the posterior $p(\bm{w}|\bm{t})$ with a
+multivariate Guassian $\mathcal{N}(\bm{w}; \bm{w}_{MAP}, \bm{S}_N)$ where
+$\bm{w}_{MAP}$ is the maximum {\it a posteriori} and thus a mode of the
+posterior and $\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln
+p(\bm{w}|\bm{t})|_{\bm{w} = \bm{w}_{MAP}}$ is the Hessian at $\bm{w}_{MAP}$.
+Since we are approximating the posterior with Gaussian, it is convenient to
+use conjugate prior $p(\bm{w}) = \mathcal{N}(\bm{w};\bm{m}_0,\bm{S}_0)$. Thus
+we have
+\begin{equation}
+\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
+\bm{S}_0^{-1}(\bm{w}-\bm{m}_0) + \sum_{n=1}^N\{t_n \ln y_n +(1-y_n) \ln
+(1-y_n)\} + const
+\end{equation}
+
+Under the Laplace approximation and the conjugated Gaussian prior, $\bm{w}_{MAP}$
+can be efficiently obtained by gradient descent. To encourage small
+$||w||^2_2$, let $\bm{m}_0 = \bm{0}$, and $\bm{S}_0 = \sigma^2 \bm{I}$, we
+have the following gradient descent rule: 
+
+\begin{equation}
+\bm{w}_t \leftarrow \bm{w}_{t-1} + \eta\left( \sum_{n=1}^N (t_n - y_{n,(t-1)}) \phib_n -
+\frac{1}{\sigma^2}\bm{w}_{t-1} \right)
+\end{equation}
+
+where $\eta$ is the learning rate constant. We can also get
+
+\begin{equation}
+\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln p(\bm{w}|\bm{t})
+= \bm{S}_0^{-1} + \sum_{n=1}^N y_n(1-y_n) \phib_n \phib_n^T
+\end{equation}
+
+The predictive distribution for Laplace-approximated posterior is not close
+form, but by approximating the logistic sigmoid function with probit function,
+we recover $\bm{w}_{MAP}$ as the decision boundary.
+>>>>>>> 1b5d3fefb3bcbf375d831e0ffe078f4b3c89c1fd
 
 \subsection{The Variational Approach by Jaakkola and Jordan}
 We study a variational method presented by Jaakkola et al.\cite{Jaakkola96avariational}. In this section, we briefly describe this variational approach for approximate inference for Bayesian logistic regression. 
