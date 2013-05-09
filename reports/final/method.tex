@@ -144,7 +144,7 @@ concentrate only on Kolmogorov Smirnov based sampling in the later sections.
 \begin{figure}[t]
 \label{fig:laplace}
 \centering
-\includegraphics[height=5.0cm]{results/uniformSampleChain.png}
+\includegraphics[height=9.0cm]{results/uniformSampleChain.png}
 
 \caption{A typical Markov chain for uniform distribution based sampler }
 
@@ -161,9 +161,12 @@ posterior and $\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln
 p(\bm{w}|\bm{t})|_{\bm{w} = \bm{w}_{MAP}}$ is the Hessian at $\bm{w}_{MAP}$.
 Since we are approximating the posterior with Gaussian, it is convenient to
 use conjugate prior $p(\bm{w}) = \mathcal{N}(\bm{w};\bm{m}_0,\bm{S}_0)$. Thus
-we have $\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
+we have
+\begin{equation}
+\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
 \bm{S}_0^{-1}(\bm{w}-\bm{m}_0) + \sum_{n=1}^N\{t_n \ln y_n +(1-y_n) \ln
-(1-y_n)\} + const$
+(1-y_n)\} + const
+\end{equation}
 
 Under the Laplace approximation and the conjugated Gaussian prior, $\bm{w}_{MAP}$
 can be efficiently obtained by gradient descent. To encourage small
