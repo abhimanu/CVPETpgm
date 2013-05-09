@@ -94,7 +94,8 @@ to draw samples from this model given fixed $\lambda$ . We just have to use
 weighted least squares rather than least squares (and teh related inverse of the 
 hessian matrix), and then just draw from individual truncated gaussain of
 different variance parameters. After this, we are in a poition to write a
-Gibbs sampler given that we will be able to sample from the KS distribution.
+Gibbs sampler given that we will be able to sample from the KS
+distribution~\cite{Massey1951}.
 \cite{Holmes} provides rejection sampling technique to draw samples 
 from the KS distribution via the Generalized Inverse Gaussian distibution as the
 sampling density. Using this, we write a simple Gibbs sampler for this
