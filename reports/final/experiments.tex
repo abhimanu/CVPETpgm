@@ -32,7 +32,7 @@ We compare classification accuracy and run-time of different algorithms. Results
 
 The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three algorithms on all three datasets. This does not necessarily show that the delta method is less accurate. First, the delta method is very sensitive to the step size parameter. We might have not yet tuned that parameter optimally. Second, the delta method takes a long time to converge. We might not have waited long enough for it to converge.
 
-The bottom graph shows the comparison of different algorithm's runtime.
+The bottom graph shows the comparison of different algorithm's runtime. We conducted our experiemnts on different platforms since we expected the difference among different algorithms to be siginificant and a rough comparison would be sufficient. We observe that sampling is indeed slower than traditional variational algorithms, which confirms our conventional wisdom.
 
 \begin{figure}[t]
 \centering
