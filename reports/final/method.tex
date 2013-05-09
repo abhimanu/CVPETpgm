@@ -114,13 +114,43 @@ There are two approaches to performing block sampling of the parameters above.
 In the first approach we sample $z$ and $w$ simultaneously and the parameter
 $\lambda$ is sampled after that. In the second approachIn the second approach 
 the block sampling updates $z$ and
-$\lambda$ first and $z$ later. This way the $z|w,\lambda$ follows a truncated
-logistic centered at $x^Tw$. This avoids the need to compute marginal predictive
-densities.    
+$\lambda$ first and $z$ later. This way the $z_i|w,\lambda$ follows a
+truncated logistic centered at $x_i^Tw$. This avoids the need to compute
+marginal predictive densities.    
 
 Another way to sample Bayesian Logistic Regression is via the use of uniform
 distribution. Groenewald et al.~\cite{Groenewald2005} provide a scheme to
-use uniform distribution for such a task. 
+use uniform distribution for such a task. As we know 
+\begin{equation}
+\pi_i = \frac{exp(x_i^Tw)}{1+exp(x_i^Tw)}
+\end{equation} 
+The equation above can also be written as a CDF of a uniform distribution as
+follows:
+\begin{equation}
+\pi_i = \int_{-\infty}^{x_i^Tw} \frac{exp(z)}{1+exp(z)} \partial z =
+P(U<\frac{exp(x_i^Tw)}{1+exp(x_i^Tw)})
+\label{eqn:uniformSample}
+\end{equation}
+
+Here we have clevelry introduced an auxiliary variable $U$.
+Now a gibbs sampler can easly be derived which alternates between $w$ and $u$.
+Though it sounds enticing the sampler obtained using this technique is high
+degree of auto-correlation between $w$ and $u$ and converges very poorly in all
+our experiments. Figure~\ref{fig:uniformSamplerChain} shows a typical uniform
+distribution based sampler on our datasets. The chain rarely converges with very
+poor results. We abandon the discussion of this method here and
+concentrate only on Kolmogorov Smirnov based sampling in the later sections.
+
+\begin{figure}[t]
+\label{fig:laplace}
+\centering
+\includegraphics[height=5.0cm]{results/uniformSampleChain.png}
+
+\caption{A typical Markov chain for uniform distribution based sampler }
+
+\label{fig:uniformSamplerChain}
+\end{figure}
+
 
 \subsection{Laplace Approximation and associated MAP}
 
