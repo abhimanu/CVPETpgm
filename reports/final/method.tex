@@ -196,7 +196,7 @@ We study a variational method presented by Jaakkola et al.\cite{Jaakkola96avaria
 Since it is infeasible to compute the posterior $p(\bm{w} | \bm{t}, \bm{\phi})$ exactly, this method approximates the sigmoid function with its variational form, as given below.
 
 \begin{align}
-  p(t | \bm{w}, \phi) &= \sigma(\Phi_s) \leq \sigma(\xi) exp\{(Phi_s - \xi)/2 + \lambda(\xi)(\Phi_s^2 - \xi^2)\} \\
+  p(t | \bm{w}, \phi) &= \sigma(\Phi_s) \geq \sigma(\xi) exp\{(Phi_s - \xi)/2 + \lambda(\xi)(\Phi_s^2 - \xi^2)\} \\
   &= P(t | \bm{w}, \phi, \xi)
 \end{align}
 where $\Phi_s = (2t - 1)\sum_jw_j\phi_j$ and $\lambda(\xi) = [1/2 - \sigma(\xi)]/(2\xi)$.
@@ -204,7 +204,7 @@ where $\Phi_s = (2t - 1)\sum_jw_j\phi_j$ and $\lambda(\xi) = [1/2 - \sigma(\xi)]
 The posterior $P(\bm{w}|\bm{t}, \bm{\phi})$ can be computed by normalizing the left hand side of the following equation.
 \begin{align}
 \label{eq:variational}
-p(\bm{t}|\bm{\phi})p(\bm{w}) &\leq P(\bm{t}|\bm{\phi}, \bm{w}, \xi)P(\bm{w})
+p(\bm{t}|\bm{\phi})p(\bm{w}) &\geq P(\bm{t}|\bm{\phi}, \bm{w}, \xi)P(\bm{w})
 \end{align}
 
 Since this normalization is not feasible in practice we normalize the variational distribution instead. As the prior distribution is a Gaussian, we assume it has mean $\mu$ and covariance matrix $\Sigma$. To compute the variational posterior, first, we absorb the observations to update $\mu$ and $\Sigma$.
