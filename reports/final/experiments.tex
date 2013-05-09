@@ -10,6 +10,7 @@ cross-validation to select parameters for prior, which may have profound
 impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of each dataset can found in Table~\ref{tb:datasets}.
 
 \begin{table}
+\begin{center}
 \begin{tabular}{| c | c |  c | c | c |}
   \hline
   Datasets & \# training instances & \# test instances & \# features & class-wise split\\
@@ -21,6 +22,7 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
   Heart Diseases & 216 & 54 & 13 & 44\% vs. 56\% \\
   \hline
 \end{tabular}
+\end{center}
 
 \caption{Datasets information}
 \label{tb:datasets}
@@ -28,11 +30,77 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
 
 \subsection{Results}
 
-We compare classification accuracy and run-time of different algorithms. Results are shown in Fig~\ref{fig:results}.
+Fig.~\ref{fig:results} shows the comparison of classification accuracy
+(Fig.~\ref{fig:results} top) and run-time (bottom) of the four approximation
+methods we consider. We find that sampling method outperforms all variational
+inferences on all three datasets by substantial margins ($6-7\%$). This is
+likely because all three variational methods make the Gaussian assumption of
+the posterior, whereas the posterior of sampling is not limited to any
+parametric form. 
 
-The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three algorithms on all three datasets. This does not necessarily show that the delta method is less accurate. First, the delta method is very sensitive to the step size parameter. We might have not yet tuned that parameter optimally. Second, the delta method takes a long time to converge. We might not have waited long enough for it to converge.
+Among the three variational approaches, Jaakkola {\it et al.} performs the
+best. This does not necessarily imply that the variational lower bound in
+Jaakkola {\it et al.} is tigher than the others. In fact, Jaakkola {\it et
+al.} outperforms the other variational methods due to technical reasons: it
+takes about 2 iterations for Jaakkola {\it et al.} to converge fully without
+any tuning, which is not the case in Laplace and Delta method. In the latter
+two approaches, the step size could effect the convergence of the gradient
+descent type of algorithms. Furthermore, Delta method involves a matrix
+inversion at each update and is computationally intensive. Thus it is very
+possible that the resulted posterior has not fully converged in the prescribed
+number of iterations. 
 
-The bottom graph shows the comparison of different algorithm's runtime. We conducted our experiemnts on different platforms since we expected the difference among different algorithms to be siginificant and a rough comparison would be sufficient. We observe that sampling is indeed slower than traditional variational algorithms, which confirms our conventional wisdom. We also observe that the delta method is siginificantly slower than the other three approaches which confirms the complexity of this algorithm.
+Due to these technical issues, we focus on the results of Yeast dataset. The
+dataset has been previously studied by Wang {\it et al.}~\cite{Wang13}; they
+reported similar classification accuracies which we tabulate in
+Table~\ref{tab:compare_wang}. The difference is within $0.5\%$ for all three
+methods, suggesting that these variational algorithms have properly converged.
+These are strong evidences that our results are the optimal or near-optimal
+performance from these variational methods. Interestingly, they all
+``max-out'' at around $80\%$ classification accuracy, possibly due to the
+Gaussian posterior assumption shared among these methods. On the other hand,
+sampling approximation achieves $86.39\%$ classification accuracy,
+demonstrating a superior approximation to the posterior.
+
+
+\begin{table}
+\label{tab:compare_wang}
+\begin{center}
+\begin{tabular}{| c | c |  c | c | c |}
+  \hline
+   & Ours  & Wang {\it et al.}~\cite{Wang13} \\
+  \hline
+  Jaakkola \& Jordan (1996) & $80.16\%$ & $79.7\%$ \\
+  \hline
+  Laplace inference & $80.16\%$ & $80.1\%$ \\
+  \hline
+  Delta inference & $80.05\%$ & $80.2\%$ \\
+  \hline
+\end{tabular}
+\end{center}
+
+\caption{Comparison between our classification accuracy and the results
+reported in Wang {\it et al.}~\cite{Wang13}}
+\end{table}
+
+
+However, this does not conclude
+we should always choose sampling algorithm for better accuracy. Sampling based
+algorithm suffers when the dimensionality of the data is high. Second, we
+observe that Delta method performs worse than other three algorithms on all
+three datasets. This does not necessarily show that the delta method is less
+accurate. First, the delta method is very sensitive to the step size
+parameter. We might have not yet tuned that parameter optimally. Second, the
+delta method takes a long time to converge. We might not have waited long
+enough for it to converge.
+
+The bottom graph shows the comparison of different algorithm's runtime. We
+conducted our experiemnts on different platforms since we expected the
+difference among different algorithms to be siginificant and a rough
+comparison would be sufficient. We observe that sampling is indeed slower than
+traditional variational algorithms, which confirms our conventional wisdom. We
+also observe that the delta method is siginificantly slower than the other
+three approaches which confirms the complexity of this algorithm.
 
 \begin{figure}[t]
 \centering
@@ -45,7 +113,7 @@ four datasets. {\bf Bottom:} Runtime for each algorithm on Yeast dataset. }
 \end{figure}
 
 \subsubsection{MCMC based converging chains}
-Our Kolmogorov Smirnov based Gibbs sampling strategy that we described in
+Our Kolmogorov Smirnove based Gibbs sampling strategy that we described in
 section~\ref{sec:MCMCmethod} consistently to same set of parameters.
 Figure~\ref{fig:MCMCconverge} is a plot of the iterations of the two
 independent Markov chains for estimation on the spambase dataset. 
@@ -53,8 +121,8 @@ The X-axix of the figure represents the number of
 iteration in sampling and Y-axis is the loglikelihood of the regression model.
 As we can see both the chains converge to the same log-likelihood value and the
 chains seem to be stable after convergence. Compare this to the markov chain
-produced via uniform distribution based sampling method in
-figure~\ref{fig:uniformSamplerChain}. The chain in this case is not stable and
+produce via uniform distribution based sampling methos in
+figure~\ref{fig:uniformSamplerChain}. the chain in this case is not stable and
 keeps oscillating between different log-likelihood states. 
  
 
