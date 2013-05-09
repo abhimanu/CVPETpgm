@@ -30,18 +30,17 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
 
 We compare classification accuracy and run-time of different algorithms. Results are shown in Fig~\ref{fig:results}.
 
-The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three
+The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three algorithms on all three datasets. This does not necessarily show that the delta method is less accurate. First, the delta method is very sensitive to the step size parameter. We might have not yet tuned that parameter optimally. Second, the delta method takes a long time to converge. We might not have waited long enough for it to converge.
 
+The bottom graph shows the comparison of different algorithm's runtime.
 
 \begin{figure}[t]
 \centering
-%\includegraphics[height=5.0cm]{../../results/classificaiton_errors.pdf}
-%\includegraphics[height=5.0cm]{../../results/runtime.pdf}
 \includegraphics[height=7.0cm]{results/accuracy_comp.png}
 \includegraphics[height=8.0cm]{results/speed_comp.png}
 
 \caption{\small Experiment results; {\bf Top:} Classification accuracy of all algorithms on
-four datasets. {\bf Bottom:} Training time for each algorithm on Yeast dataset. }
+four datasets. {\bf Bottom:} Runtime for each algorithm on Yeast dataset. }
 \label{fig:results}
 \end{figure}
 
