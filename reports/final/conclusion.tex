@@ -1,10 +1,19 @@
 
 \section{Conclusion an Future Work}
+As we can see Kolmogorov Smirnov based sampling based sampling performs
+considerable well compared all other methods in terms of raw accuracy of
+prediction. Though it is slower in speed compared to other variational methods
+such as Laplace and Jordan's method. Sampling is harder to tune due to
+asymptotic natur eof the approach. It also suffers from bad-mixing if the
+feature space os very large as well as when there is high correlaton between
+successive particles sampled. This slow mixing can be clearly observed the
+uniform distribution based sampling approach for Bayesian logistic regression. 
+
 The three algorithms used in this paper almost surely cover the
-span of various flavors of approximation algorithms used in all graphical model
-estimation. There are other approximation algorithms such as loopy belief
-propagation for general graphs but these are variants of the algorithms covered
-in this work~\ref{Heskes02}
+span of various styles of approximation algorithms used in all graphical model
+estimations. There are other approximation algorithms such as loopy belief
+propagation for general graphs but these are variants of the variational mehods
+covered in this work~\cite{Heskes02}. We covered broad 
 
 Sampling performs
 comparatively better than the other approximate inference schemes on all datasets
