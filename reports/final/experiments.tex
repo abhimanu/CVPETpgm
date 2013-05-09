@@ -28,7 +28,7 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
 \label{tb:datasets}
 \end{table}
 
-\subsection{Results}
+\subsection{Results and Discussions}
 
 Fig.~\ref{fig:results} shows the comparison of classification accuracy
 (Fig.~\ref{fig:results} top) and run-time (bottom) of the four approximation
@@ -48,7 +48,8 @@ two approaches, the step size could effect the convergence of the gradient
 descent type of algorithms. Furthermore, Delta method involves a matrix
 inversion at each update and is computationally intensive. Thus it is very
 possible that the resulted posterior has not fully converged in the prescribed
-number of iterations. 
+number of iterations. The poor results from Delta method is a testament to the
+fragile nature of these approximation algorithms.
 
 Due to these technical issues, we focus on the results of Yeast dataset. The
 dataset has been previously studied by Wang {\it et al.}~\cite{Wang13}; they
@@ -83,24 +84,27 @@ demonstrating a superior approximation to the posterior.
 reported in Wang {\it et al.}~\cite{Wang13}}
 \end{table}
 
+We also point out that the performance is measure on three datasets that are
+relatively low dimensional ($dim \le 10^2$). It is unclear of how these
+algorithms will perform relative to each other in higher dimensions.
+Specifically, sampling method will face statistical difficulties in high
+dimensional space, while Delta method Jaakkola \& Jordan will primarily be
+hindered by computation challenge, due to the inversion of covariance matrix
+that are $O(d^2)$ where $d$ is the number of dimensions. On the other hand,
+Laplace approximation scales linearly in $d$, thus might have some advantage
+in higher dimension space. In practice, we can carry out dimension
+reduction using, for example, $L-1$ regularized logistic regression, thus
+alleviating the high dimensional problem these algorithms face. 
 
-However, this does not conclude
-we should always choose sampling algorithm for better accuracy. Sampling based
-algorithm suffers when the dimensionality of the data is high. Second, we
-observe that Delta method performs worse than other three algorithms on all
-three datasets. This does not necessarily show that the delta method is less
-accurate. First, the delta method is very sensitive to the step size
-parameter. We might have not yet tuned that parameter optimally. Second, the
-delta method takes a long time to converge. We might not have waited long
-enough for it to converge.
-
-The bottom graph shows the comparison of different algorithm's runtime. We
-conducted our experiemnts on different platforms since we expected the
-difference among different algorithms to be siginificant and a rough
-comparison would be sufficient. We observe that sampling is indeed slower than
-traditional variational algorithms, which confirms our conventional wisdom. We
-also observe that the delta method is siginificantly slower than the other
-three approaches which confirms the complexity of this algorithm.
+The bottom graph of Fig.~\ref{fig:results} shows the comparison of different
+algorithm's runtime. We conducted our experiemnts on different platforms since
+we expected the difference among different algorithms to be siginificant and
+an approximate runtime comparison would be sufficient. We observe that
+sampling is indeed slower than most variational algorithms, which confirms the
+conventional wisdom that sampling is slower. We also observe that the delta
+method is siginificantly slower than the other three approaches, consistent
+with the fact that Delta method has the highest computational complexity among
+the three variational inferences.
 
 \begin{figure}[t]
 \centering
