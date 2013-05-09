@@ -30,11 +30,10 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
 
 We compare classification accuracy and run-time of different algorithms. Results are shown in Fig~\ref{fig:results}.
 
-The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs 
+The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three
 
 
 \begin{figure}[t]
-\label{fig:results}
 \centering
 %\includegraphics[height=5.0cm]{../../results/classificaiton_errors.pdf}
 %\includegraphics[height=5.0cm]{../../results/runtime.pdf}
@@ -43,8 +42,7 @@ The top graph shows the comparision of different algorithm's classification accu
 
 \caption{\small Experiment results; {\bf Top:} Classification accuracy of all algorithms on
 four datasets. {\bf Bottom:} Training time for each algorithm on Yeast dataset. }
-
-\label{graphlab}
+\label{fig:results}
 \end{figure}
 
 \subsubsection{MCMC based estimation}
