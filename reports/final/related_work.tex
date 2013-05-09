@@ -44,5 +44,13 @@ estimation techniques inclding sampling, variational and Laplace techniques, for
 graphical models. Besides we also perform a comparitive study of these
 techniques over two distinct graph objectives: 1) MLE, and 2)MAP. It
 would be a worthwhile effort which has a potential to provide working insights
-into the world of these complex estimation techniques.
+into the world of these complex estimation techniques. For Bayesian logistic
+regression gibbs sampling is a simplified version of the Metropolis–Hastings
+algorithm (\cite{Metropolis53}; \cite{Hastings70}), and is used whenever it is
+possible to sample directly from all conditional distributions. The Metropolis–Hastings algorithm
+is generally used in the case of logistic regression. Other Markov chain
+Monte Carlo techniques in use are adaptive rejection sampling (ARS), 
+which is used in the WinBugs
+software, and adaptive rejection metropolis sampling (ARMS)~\cite{gilks_95}.
+
 

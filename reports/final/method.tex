@@ -2,7 +2,7 @@
 
 \begin{figure}[t]
 \centering
-\includegraphics[height=3.0cm]{BLR_graphical.png}
+\includegraphics[height=4.0cm]{BLR_graphical.png}
 
 \caption{\small Graphical model of Bayesian logistic regression. Here
 $t_n \in \{0,1\}$ is the class label, $\phi({\bf x}_n)$ is the feature map,
@@ -94,7 +94,8 @@ to draw samples from this model given fixed $\lambda$ . We just have to use
 weighted least squares rather than least squares (and teh related inverse of the 
 hessian matrix), and then just draw from individual truncated gaussain of
 different variance parameters. After this, we are in a poition to write a
-Gibbs sampler given that we will be able to sample from the KS distribution.
+Gibbs sampler given that we will be able to sample from the KS
+distribution~\cite{Massey1951}.
 \cite{Holmes} provides rejection sampling technique to draw samples 
 from the KS distribution via the Generalized Inverse Gaussian distibution as the
 sampling density. Using this, we write a simple Gibbs sampler for this
@@ -142,13 +143,11 @@ poor results. We abandon the discussion of this method here and
 concentrate only on Kolmogorov Smirnov based sampling in the later sections.
 
 \begin{figure}[t]
-\label{fig:laplace}
-\centering
-\includegraphics[height=10.0cm]{results/uniformSampleChain.png}
-
+\begin{center}
+\includegraphics[height=11.5cm]{results/uniformSampleChain.png}
 \caption{A typical Markov chain for uniform distribution based sampler on the
 Spambase dataset}
-
+\end{center}
 \label{fig:uniformSamplerChain}
 \end{figure}
 
