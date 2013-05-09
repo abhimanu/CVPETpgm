@@ -1,4 +1,16 @@
 \section{Methods}
+
+\begin{figure}[t]
+\centering
+\includegraphics[height=3.0cm]{BLR_graphical.png}
+
+\caption{\small Graphical model of Bayesian logistic regression. Here
+$t_n \in \{0,1\}$ is the class label, $\phi({\bf x}_n)$ is the feature map,
+and ${\bf w}$ is the model parameter.}
+
+\label{fig:BLR_graphical}
+\end{figure}
+
 Given data set $\{\phib_n, t_n\}_{n=1}^N$ where $\phib_n$ are the feature
 vectors and $t_n\in \{0,1\}$ are the labels, we can write the likelihood
 function for logistic regression as $p(\bm{t}|\bm{w}) = \prod_{n=1}^N
