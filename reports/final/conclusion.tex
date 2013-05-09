@@ -4,10 +4,25 @@ As we can see Kolmogorov Smirnov based sampling based sampling performs
 considerable well compared all other methods in terms of raw accuracy of
 prediction. Though it is slower in speed compared to other variational methods
 such as Laplace and Jordan's method. Sampling is harder to tune due to
-asymptotic natur eof the approach. It also suffers from bad-mixing if the
-feature space os very large as well as when there is high correlaton between
-successive particles sampled. This slow mixing can be clearly observed the
-uniform distribution based sampling approach for Bayesian logistic regression. 
+asymptotic nature of the approach. It also suffers from bad-mixing if the
+feature space is very large as well as when there is high correlaton among
+successive particles sampled. This slow mixing can be clearly observed in the
+uniform distribution based sampling approach for Bayesian logistic regression.
+Sampling requires not only high degree of parameter tuning it also needs good
+proposal distributions which are harder to find especially in case of
+non-conjugacy. 
+
+On the other hand we see that variational based approximations are considerable
+fast (except delta method) but they perform poorly. This is understandable since
+they maximize a lower bound on the original objective (log-likelihood) compared
+to sampling which maximizes the log-likelihood itself. the variational updates
+coming from an optimization family of approcahes suffer from the typical
+step-size selection problem. tuning this step size seems specially important in
+this case since there are many more parameters in case of graphical models than
+anyother typical optimization objective. The slow speed as well poor
+converegence of delta method is a peculiar observation. We believe that delta is
+highly prone to tuning various parameters and initial points and thus behaves
+poorly. 
 
 The three algorithms used in this paper almost surely cover the
 span of various styles of approximation algorithms used in all graphical model
@@ -23,4 +38,4 @@ comparatively better than the other approximate inference schemes on all dataset
     Variational schemes are sensitive to step size of the ascent while optimizing
 
     MCMC based sampling is slower than most variational inference (except delta method).
-    But can be fast when there is good mixing in the chains
+    But can be fast when there is good mixing in the chains.

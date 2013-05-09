@@ -30,35 +30,33 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
 
 We compare classification accuracy and run-time of different algorithms. Results are shown in Fig~\ref{fig:results}.
 
-The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three
+The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs worse than other three algorithms on all three datasets. This does not necessarily show that the delta method is less accurate. First, the delta method is very sensitive to the step size parameter. We might have not yet tuned that parameter optimally. Second, the delta method takes a long time to converge. We might not have waited long enough for it to converge.
 
+The bottom graph shows the comparison of different algorithm's runtime. We conducted our experiemnts on different platforms since we expected the difference among different algorithms to be siginificant and a rough comparison would be sufficient. We observe that sampling is indeed slower than traditional variational algorithms, which confirms our conventional wisdom. We also observe that the delta method is siginificantly slower than the other three approaches which confirms the complexity of this algorithm.
 
 \begin{figure}[t]
 \centering
-%\includegraphics[height=5.0cm]{../../results/classificaiton_errors.pdf}
-%\includegraphics[height=5.0cm]{../../results/runtime.pdf}
 \includegraphics[height=7.0cm]{results/accuracy_comp.png}
 \includegraphics[height=8.0cm]{results/speed_comp.png}
 
 \caption{\small Experiment results; {\bf Top:} Classification accuracy of all algorithms on
-four datasets. {\bf Bottom:} Training time for each algorithm on Yeast dataset. }
+four datasets. {\bf Bottom:} Runtime for each algorithm on Yeast dataset. }
 \label{fig:results}
 \end{figure}
 
-\subsubsection{MCMC based estimation}
-Our MCMC sampling strategy that we described in section~\ref{sec:MCMCmethod}
-converges. Figure~\ref{fig:MCMCconverge} is a plot of the iterations of the Markov 
-chain for estimation on a subset of Farms Ads dataset. This is for MLE
-estimation without any priors. The X-axix of the figure represents the number of
-iteration in sampling and Y-axi si the loglikelihood of theregression model We
-also achieve a training accuracy of 8.57\% and a test accuracy of 9.12\% over 
-this subset of datset. 
-
-We were only able to run the experiments on this subset of the dataset as the
-sampler if slow since we have a rejection sampling component besides various
-other samplers. The acceptance ratio of the rejection step is is one quarter on
-an average accross number of iterations. In future we plan to fins a better
-alternative to this rejection sampler to achieve better speed. 
+\subsubsection{MCMC based converging chains}
+Our Kolmogorov Smirnove based Gibbs sampling strategy that we described in
+section~\ref{sec:MCMCmethod} consistently to same set of parameters.
+Figure~\ref{fig:MCMCconverge} is a plot of the iterations of the two
+independent Markov chains for estimation on the spambase dataset. 
+The X-axix of the figure represents the number of
+iteration in sampling and Y-axis is the loglikelihood of the regression model.
+As we can see both the chains converge to the same log-likelihood value and the
+chains seem to be stable after convergence. Compare this to the markov chain
+produce via uniform distribution based sampling methos in
+figure~\ref{fig:uniformSamplerChain}. the chain in this case is not stable and
+keeps oscillating between different log-likelihood states. 
+ 
 
 \begin{figure}[hbt]
 \includegraphics[width=1\textwidth]{results/KSsampleChain.png}
