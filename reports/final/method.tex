@@ -57,6 +57,17 @@ and these conditional means are updated after each draw of $z_i$.
 Later we sample w from its conditional gaussian after all of the
 $z_i$ have been drawn. 
 
+We can also apply block sampling here. 
+There are two approaches to performing block sampling of the parameters above.
+In the first approach we sample $z$ and $w$ simultaneously and the parameter
+$\lambda$ is sampled after that. In the second approachIn the second approach 
+the block sampling updates $z$ and
+$\lambda$ first and $z$ later. This way the $z|w,\lambda$ follows a truncated
+logistic centered at $x^Tw$. This avoids the need to compute marginal predictive
+densities.    
+
+Another way to sample Ba
+
 \subsubsection{Binary Logistic Regression}
 Starting from the binary Bayesian probit regression model explained before , we
 propose to obtain updates for binary Bayesian logistic regression by
