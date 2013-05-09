@@ -28,26 +28,13 @@ impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of ea
 
 \subsection{Results}
 
-We compare classification accuracy and run-time of different algorithms.
+We compare classification accuracy and run-time of different algorithms. Results are shown in Fig~\ref{fig:results}.
 
-We perform Laplace approximation, which has predictive distribution equivalent
-to the MAP estimate under the same approximation. Fig.~\ref{fig:laplace} shows
-that the classifier perform reasonably well on both data sets. Moreover, since
-our data sets are high dimensional, it is paramount to avoid overfitting. The
-classification error on test and training sets are close, demonstrating that
-our prior is sufficient for these data sets. Currently we are using $\sigma =
-0.05$, which is a relatively concentrated prior. As the next step we would
-like to employ cross validation to select an optimal prior covariance $\sigma$.
-
-Even though the data set is intrinsically large, fig.~\ref{fig:laplace} shows
-that training on a single machine is reasonably fast. Note that training
-converges in 172 and 209 iterations for p53 and farm ads data set,
-respectively. Thus the run time {\em per} iteration is comparable: about $5$
-seconds per iteration.
+The top graph shows the comparision of different algorithm's classification accuracy. First, we observe that the sampling algorithm outperforms all variational-based approaches on all datasets. However, this does not conclude we should always choose sampling algorithm for better accuracy. Sampling based algorithm suffers when the dimensionality of the data is high. Second, we observe that Delta method performs 
 
 
 \begin{figure}[t]
-\label{fig:laplace}
+\label{fig:results}
 \centering
 %\includegraphics[height=5.0cm]{../../results/classificaiton_errors.pdf}
 %\includegraphics[height=5.0cm]{../../results/runtime.pdf}
