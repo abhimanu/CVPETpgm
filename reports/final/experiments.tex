@@ -44,7 +44,7 @@ parametric form.
 
 Among the three variational approaches, Jaakkola {\it et al.} performs the
 best. This does not necessarily imply that the variational lower bound in
-Jaakkola {\it et al.} is tigher than the others. In fact, Jaakkola {\it et
+Jaakkola {\it et al.} is tighter than the others. In fact, Jaakkola {\it et
 al.} outperforms the other variational methods due to technical reasons: it
 takes about 2 iterations for Jaakkola {\it et al.} to converge fully without
 any tuning, which is not the case in Laplace and Delta method. In the latter
@@ -88,7 +88,7 @@ demonstrating a superior approximation to the posterior.
 reported in Wang {\it et al.}~\cite{Wang13}}
 \end{table}
 
-We also point out that the performance is measure on three datasets that are
+We also point out that the performances are measured on three datasets that are
 relatively low dimensional ($dim \le 10^2$). It is unclear of how these
 algorithms will perform relative to each other in higher dimensions.
 Specifically, sampling method will face statistical difficulties in high
@@ -121,17 +121,18 @@ four datasets. {\bf Bottom:} Runtime for each algorithm on Yeast dataset. }
 \end{figure}
 
 \subsubsection{MCMC based converging chains}
+
 Our Kolmogorov Smirnove based Gibbs sampling strategy that we described in
-section~\ref{sec:MCMCmethod} consistently to same set of parameters.
+section~\ref{sec:MCMCmethod} consistently converge to same set of parameters.
 Figure~\ref{fig:MCMCconverge} is a plot of the iterations of the two
-independent Markov chains for estimation on the spambase dataset. 
-The X-axix of the figure represents the number of
-iteration in sampling and Y-axis is the loglikelihood of the regression model.
-As we can see both the chains converge to the same log-likelihood value and the
-chains seem to be stable after convergence. Compare this to the markov chain
-produce via uniform distribution based sampling methos in
-figure~\ref{fig:uniformSamplerChain}. the chain in this case is not stable and
-keeps oscillating between different log-likelihood states. 
+independent Markov chains for estimation on the spambase dataset.  The X-axix
+of the figure represents the number of iteration in sampling and Y-axis is the
+loglikelihood of the regression model.  As we can see both the chains converge
+to the same log-likelihood value and the chains seem to be stable after
+convergence. Compare this to the markov chain produce via uniform distribution
+based sampling methos in figure~\ref{fig:uniformSamplerChain}. the chain in
+this case is not stable and keeps oscillating between different log-likelihood
+states. 
  
 
 \begin{figure}[hbt]
