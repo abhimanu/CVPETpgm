@@ -1,7 +1,7 @@
 
 \section{Conclusion an Future Work}
-As we can see Kolmogorov Smirnov based sampling based sampling performs
-considerable well compared all other methods in terms of raw accuracy of
+As we can see Kolmogorov Smirnov based sampling performs
+considerable well compared to all other methods in terms of raw accuracy of
 prediction. Though it is slower in speed compared to other variational methods
 such as Laplace and Jordan's method. Sampling is harder to tune due to
 asymptotic nature of the approach. It also suffers from bad-mixing if the
@@ -17,7 +17,7 @@ fast (except delta method) but they perform poorly. This is understandable since
 they maximize a lower bound on the original objective (log-likelihood) compared
 to sampling which maximizes the log-likelihood itself. the variational updates
 coming from an optimization family of approcahes suffer from the typical
-step-size selection problem. tuning this step size seems specially important in
+step-size selection problem. Tuning this step size seems specially important in
 this case since there are many more parameters in case of graphical models than
 anyother typical optimization objective. The slow speed as well poor
 converegence of delta method is a peculiar observation. We believe that delta is
@@ -36,17 +36,17 @@ accurate approximation techniques based on the approaches present in the
 literature.
 
 As we know sampling based techniques perform not so well in high dimensions. A
-future extension of the work would be to evaluation sampling techniques on high
+future extension of the work would be to evaluate sampling techniques on high
 dimensional models. This can be achieved either by increasing the feature space
-in the current Bayesian logistic regresison problem or a different high
-dimensional model altogether such as consitional random fields~\cite{sutton06introduction} 
-or some
+in the current Bayesian logistic regression problem or a different high
+dimensional model altogether such as conditional random
+fields~\cite{sutton06introduction} or some
 other model with complex structured feature space with high dimensions. Since
 variational based methods generaly perform well in higher dimension there is a
 a likelihood that they might beat sampling not just in speed but accuracy too. 
-Another interestin dimension to explore would be a comparison between
+Another interesting dimension to explore would be a comparison between
 distributed version of these approximation techniques. Since the biggest
-drawback of sampling based methods is there slow speed of converegence, a
+drawback of sampling based methods is their slow speed of converegence, a
 distributed sampling strategy might be fatser as well accurate and thus a better
 alternative to other techniques. 
 

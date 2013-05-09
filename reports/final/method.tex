@@ -112,7 +112,7 @@ W=diag(\lambda^{-1}) \\
 We use block Gibbs sampling here. 
 There are two approaches to performing block sampling of the parameters above.
 In the first approach we sample $z$ and $w$ simultaneously and the parameter
-$\lambda$ is sampled after that. In the second approachIn the second approach 
+$\lambda$ is sampled after that. In the second approach 
 the block sampling updates $z$ and
 $\lambda$ first and $z$ later. This way the $z_i|w,\lambda$ follows a
 truncated logistic centered at $x_i^Tw$. This avoids the need to compute
@@ -132,7 +132,7 @@ P(U<\frac{exp(x_i^Tw)}{1+exp(x_i^Tw)})
 \label{eqn:uniformSample}
 \end{equation}
 
-Here we have clevelry introduced an auxiliary variable $U$.
+Here we have cleverly introduced an auxiliary variable $U$.
 Now a gibbs sampler can easly be derived which alternates between $w$ and $u$.
 Though it sounds enticing the sampler obtained using this technique is high
 degree of auto-correlation between $w$ and $u$ and converges very poorly in all
@@ -146,7 +146,8 @@ concentrate only on Kolmogorov Smirnov based sampling in the later sections.
 \centering
 \includegraphics[height=10.0cm]{results/uniformSampleChain.png}
 
-\caption{A typical Markov chain for uniform distribution based sampler }
+\caption{A typical Markov chain for uniform distribution based sampler on the
+Spambase dataset}
 
 \label{fig:uniformSamplerChain}
 \end{figure}
@@ -154,7 +155,7 @@ concentrate only on Kolmogorov Smirnov based sampling in the later sections.
 
 \subsection{Laplace Approximation and associated MAP}
 
-Laplace approximation approximate the posterior $p(\bm{w}|\bm{t})$ with a
+Laplace approximation approximates the posterior $p(\bm{w}|\bm{t})$ with a
 multivariate Guassian $\mathcal{N}(\bm{w}; \bm{w}_{MAP}, \bm{S}_N)$ where
 $\bm{w}_{MAP}$ is the maximum {\it a posteriori} and thus a mode of the
 posterior and $\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln
