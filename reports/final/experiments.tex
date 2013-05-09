@@ -3,11 +3,15 @@
 
 \subsection{Data Sets}
 
-We evaluated our implementations of various algorithms on 3 diverse datasets. The feature sets include real numbers, intergers and categorical values. The datasets are randomly split into training sets $80\%$ and
-testing sets $20\%$. For multi-class data sets we do one-vs-all (OVA)
-classifiers. For approximations that has reasonable run time, we will perform
-cross-validation to select parameters for prior, which may have profound
-impact on the result as suggested by~\cite{Asuncion2009smoothing}. Details of each dataset can found in Table~\ref{tb:datasets}.
+We evaluated our implementations of various algorithms on 3 diverse datasets.
+The feature sets include real numbers, intergers and categorical values. The
+datasets are randomly split into training sets $80\%$ and testing sets $20\%$.
+For multi-class data sets we do one-vs-all (OVA) classifiers and record the
+average classification accuracy across all classes. For approximations that
+has reasonable run time, we will perform cross-validation to select parameters
+for prior, which may have profound impact on the result as suggested
+  by~\cite{Asuncion2009smoothing}. Details of each dataset can found in
+  Table~\ref{tb:datasets}.
 
 \begin{table}
 \begin{center}
