@@ -1,2 +1,84 @@
 \subsection{Delta Method}
 
+We rewrite 
+
+\begin{equation}
+p({\bf t} | {\bf x}^n, {\bf w}) = h({\bf t}) \exp\{\eta({\bf
+w})^{\top} {\bf T}({\bf t}^n) - a(\eta({\bf w}))\}
+\end{equation}
+
+as exponential family, where 
+
+\begin{align}
+\begin{split}
+h({\bf t}) &= 1
+\\
+{\bf T}({\bf t}^n) &= 
+\begin{bmatrix}
+t_{1,0} & t_{2,0} & ... & t_{N,0} \\
+t_{1,1} & t_{2,1} & ... & t_{N,1}
+%\mathbb{I}(t_1=1) & \mathbb{I}(t_2=1)] & ... & \mathbb{I}(t_N=1)
+\end{bmatrix}
+\\
+t_{n, 0} = \mathbb{I}(t_1=0) \quad t_{n,1} = \mathbb{I}(t_1=1)
+\\
+\eta(\wb) &= 
+\begin{bmatrix}
+\log \sigma(\wb^{\top} \phib_1) & \log \sigma(-\wb^{\top} \phib_1) \\
+... & ... \\
+\log \sigma(\wb^{\top} \phib_N) & \log \sigma(-\wb^{\top} \phib_N) \\
+\end{bmatrix}
+\\
+a(\eta(\wb)) &= 0
+\end{split}
+\end{align}
+
+In delta method, we assume the variational distribution $q(\wb) =
+\mathcal{N}(\wb;\mu, \Sigma)$ to be Gaussian and minimizes the $KL$ divergence
+between $q$ and the posterior $p(\wb|\mathcal{D})$ where $\mathcal{D}$ is the
+data. Under standard variational theory it can be shown that the minimization
+is equivalent to maximizing $\mathcal{L}(q) \doteq \mathbb{E}_q[\log p(\wb,
+\phib)] + H[q]$, a lower bound of data log-likelihood, where $H[\cdot]$ is the
+entropy. Thus $\mathcal{L}$ is our variational objective.
+
+Substituting in $q(\wb) = \mathcal{N}(\wb;\mu, \Sigma)$ to $\mathcal{L}$ and 
+dropping terms constant in $q(\wb)$, we have
+
+\begin{align}\begin{split}
+\mathcal{L}(q(\wb)) &= \mathbb{E}_q[\eta(\wb)^{\top} \mathbb{E}_{q(z)}
+[\mathbf{T}(\mathbf{t}^n)] - a(\eta(\wb)) + \log p(\wb)] + \frac{1}{2} \log |\Sigma| 
+\\
+&= \mathbb{E}_{q(\wb)}[f(\wb)] + \frac{1}{2} \log |\Sigma|
+\end{split} \end{align}
+
+where $f(\wb) \defeq \eta(\wb)^{\top} \mathbb{E}_{q(z)}
+[\mathbf{T}(\mathbf{t}^n)] - a(\eta(\wb)) + \log p(\wb)$. Taylor expand $f(\wb)$ 
+around $\mu$, the mean of variational distribution $q(\wb)$, to the second order,
+we have 
+
+\begin{equation}
+\mathcal{L}(q(\wb)) \approx f(\mu) + \frac{1}{2} Tr\{\nabla^2 f(\mu)\Sigma\} 
++ \frac{1}{2} \log |\Sigma|
+\end{equation}
+
+where $Tr\{\cdot\}$ is the trace. We can use coordinate descent algorithm to
+iteratively optimize $\mathcal{L}$ with respect to $\mu$ and $\Sigma$. We will
+need:
+
+\begin{align}
+\nabla \mathcal{L}(\mu) &= \nabla f(\mu) + \frac{1}{2}\nabla Tr\{\nabla f(\mu) 
+\Sigma\}
+\\
+\nabla f(\mu) &= \sum_n \phib_n (t_{n,0} - \sigma(\wb^{\top} \phib_n)) - 
+\Sigma_0^{-1} (\wb - \mu_0)
+\\
+\nabla Tr\{\nabla f(\mu)  \Sigma\} &= -\sum_n \sigma(\wb^{\top}\phib_n)
+\sigma(-\wb^{\top}\phib_n) (1-2\sigma(\wb^{\top}\phib_n)) \phi_n \phi_n^{\top} \Sigma \phi_n
+\end{align}
+
+and $\Sigma = -\nabla^2 f(\mu)^{-1}$ has close form update, where 
+
+\begin{equation}
+\nabla^2 f(\mu) = -\sum_n \sigma(\wb^{\top}\phib_n)\sigma(-\wb^{\top}\phib_n) phi_n phi_n^{\top}
+- \Sigma_0^{-1}
+\end{equation}
