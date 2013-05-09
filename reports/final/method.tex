@@ -69,6 +69,8 @@ and these conditional means are updated after each draw of $z_i$.
 Later we sample w from its conditional gaussian after all of the
 $z_i$ have been drawn. 
 
+
+
 \subsubsection{Binary Logistic Regression}
 Starting from the binary Bayesian probit regression model explained before , we
 propose to obtain updates for binary Bayesian logistic regression by
@@ -107,6 +109,49 @@ V=(v^{-1}+X^TWX)^{-1} \\
 W=diag(\lambda^{-1}) \\
 \end{eqnarray}
 
+We use block Gibbs sampling here. 
+There are two approaches to performing block sampling of the parameters above.
+In the first approach we sample $z$ and $w$ simultaneously and the parameter
+$\lambda$ is sampled after that. In the second approachIn the second approach 
+the block sampling updates $z$ and
+$\lambda$ first and $z$ later. This way the $z_i|w,\lambda$ follows a
+truncated logistic centered at $x_i^Tw$. This avoids the need to compute
+marginal predictive densities.    
+
+Another way to sample Bayesian Logistic Regression is via the use of uniform
+distribution. Groenewald et al.~\cite{Groenewald2005} provide a scheme to
+use uniform distribution for such a task. As we know 
+\begin{equation}
+\pi_i = \frac{exp(x_i^Tw)}{1+exp(x_i^Tw)}
+\end{equation} 
+The equation above can also be written as a CDF of a uniform distribution as
+follows:
+\begin{equation}
+\pi_i = \int_{-\infty}^{x_i^Tw} \frac{exp(z)}{1+exp(z)} \partial z =
+P(U<\frac{exp(x_i^Tw)}{1+exp(x_i^Tw)})
+\label{eqn:uniformSample}
+\end{equation}
+
+Here we have clevelry introduced an auxiliary variable $U$.
+Now a gibbs sampler can easly be derived which alternates between $w$ and $u$.
+Though it sounds enticing the sampler obtained using this technique is high
+degree of auto-correlation between $w$ and $u$ and converges very poorly in all
+our experiments. Figure~\ref{fig:uniformSamplerChain} shows a typical uniform
+distribution based sampler on our datasets. The chain rarely converges with very
+poor results. We abandon the discussion of this method here and
+concentrate only on Kolmogorov Smirnov based sampling in the later sections.
+
+\begin{figure}[t]
+\label{fig:laplace}
+\centering
+\includegraphics[height=9.0cm]{results/uniformSampleChain.png}
+
+\caption{A typical Markov chain for uniform distribution based sampler }
+
+\label{fig:uniformSamplerChain}
+\end{figure}
+
+
 \subsection{Laplace Approximation and associated MAP}
 
 Laplace approximation approximate the posterior $p(\bm{w}|\bm{t})$ with a
@@ -116,9 +161,12 @@ posterior and $\bm{S}_N^{-1} = -\nabla^2_{\bm{w}} \ln
 p(\bm{w}|\bm{t})|_{\bm{w} = \bm{w}_{MAP}}$ is the Hessian at $\bm{w}_{MAP}$.
 Since we are approximating the posterior with Gaussian, it is convenient to
 use conjugate prior $p(\bm{w}) = \mathcal{N}(\bm{w};\bm{m}_0,\bm{S}_0)$. Thus
-we have $\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
+we have
+\begin{equation}
+\ln p(\bm{w}|\bm{t}) = -\frac{1}{2}(\bm{w}-\bm{m}_0)^T
 \bm{S}_0^{-1}(\bm{w}-\bm{m}_0) + \sum_{n=1}^N\{t_n \ln y_n +(1-y_n) \ln
-(1-y_n)\} + const$
+(1-y_n)\} + const
+\end{equation}
 
 Under the Laplace approximation and the conjugated Gaussian prior, $\bm{w}_{MAP}$
 can be efficiently obtained by gradient descent. To encourage small
